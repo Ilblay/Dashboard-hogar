@@ -27,6 +27,7 @@ jobs:
 
       - name: Run fetch_data.py
         env:
+          TZ: America/Santiago
           TUYA_ACCESS_ID: ${{ secrets.TUYA_ACCESS_ID }}
           TUYA_ACCESS_SECRET: ${{ secrets.TUYA_ACCESS_SECRET }}
         run: python fetch_data.py

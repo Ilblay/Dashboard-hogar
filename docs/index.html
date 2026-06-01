@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Hogar - Consumo Electrico</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6f8; --card: #ffffff; --text: #1f2937; --muted: #6b7280;
+    --primary: #2563eb; --noche: #1e3a8a; --dia: #f59e0b; --punta: #dc2626;
+    --green: #10b981; --red: #ef4444; --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         background: var(--bg); color: var(--text); padding: 24px; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-end;
+           margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+  h1 { margin: 0; font-size: 1.6rem; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-top: 4px; }
+  .updated { color: var(--muted); font-size: 0.85rem; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 24px; }
+  .card { background: var(--card); border-radius: 12px; padding: 18px 20px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+  .card .label { color: var(--muted); font-size: 0.85rem; text-transform: uppercase;
+                 letter-spacing: 0.05em; margin-bottom: 6px; }
+  .card .value { font-size: 1.7rem; font-weight: 700; line-height: 1.2; }
+  .card .sub { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  .delta-up { color: var(--red); }
+  .delta-down { color: var(--green); }
+  .row { display: grid; gap: 16px; grid-template-columns: 2fr 1fr; margin-bottom: 24px; }
+  @media (max-width: 800px) { .row { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border-radius: 12px; padding: 18px 20px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+  .chart-card h3 { margin: 0 0 16px 0; font-size: 1.05rem; }
+  .chart-wrap { position: relative; height: 280px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.05em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  th.num { text-align: right; }
+  .tramo-pill { display: inline-block; padding: 2px 8px; border-radius: 999px;
+                font-size: 0.78rem; font-weight: 500; color: white; }
+  .tramo-noche { background: var(--noche); }
+  .tramo-dia { background: var(--dia); }
+  .tramo-punta { background: var(--punta); }
+  .info-banner { background: #eff6ff; border-left: 4px solid var(--primary);
+                 border-radius: 8px; padding: 12px 16px; margin-bottom: 24px;
+                 font-size: 0.9rem; color: #1e40af; }
+  .warn-banner { background: #fef3c7; border-left: 4px solid var(--dia);
+                 border-radius: 8px; padding: 12px 16px; margin-bottom: 24px;
+                 font-size: 0.9rem; color: #92400e; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 0.82rem; text-align: center; }
+  .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .progress-bar > div { height: 100%; background: var(--primary); transition: width 0.3s; }
+  .device-tile { border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+                 display: flex; flex-direction: column; gap: 6px; background: #fafbfc; }
+  .device-tile.is-on { background: #ecfdf5; border-color: #6ee7b7; }
+  .device-tile.is-active { background: #fef3c7; border-color: #fbbf24;
+                           box-shadow: 0 0 0 2px rgba(251,191,36,0.15); }
+  .device-tile.is-off { opacity: 0.7; }
+  .device-tile .dev-name { font-weight: 600; display: flex; justify-content: space-between;
+                           align-items: center; gap: 8px; }
+  .device-tile .dev-type { font-size: 0.72rem; color: var(--muted);
+                           text-transform: uppercase; letter-spacing: 0.05em; }
+  .device-tile .dev-power { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+  .device-tile .dev-detail { font-size: 0.82rem; color: var(--muted); }
+  .pulse-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .pulse-dot.on { background: var(--green); animation: pulse 1.4s infinite; }
+  .pulse-dot.off { background: #9ca3af; }
+  .pulse-dot.active { background: var(--dia); animation: pulse 0.8s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  }
+  .badge { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .badge-on { background: var(--green); color: white; }
+  .badge-off { background: #9ca3af; color: white; }
+  .badge-active { background: var(--dia); color: white; }
+  .alert-card { border-radius: 10px; padding: 14px 18px; margin-bottom: 12px;
+                border-left: 4px solid; display: flex; gap: 14px; align-items: flex-start; }
+  .alert-card .alert-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .alert-card .alert-title { font-weight: 600; margin-bottom: 4px; }
+  .alert-card .alert-detail { font-size: 0.88rem; color: var(--muted); }
+  .alert-critico { background: #fef2f2; border-color: var(--red); }
+  .alert-critico .alert-title { color: var(--red); }
+  .alert-advertencia { background: #fffbeb; border-color: var(--dia); }
+  .alert-advertencia .alert-title { color: #92400e; }
+  .alert-ok { background: #f0fdf4; border-color: var(--green); }
+  .alert-ok .alert-title { color: #065f46; }
+  .budget-tracker { background: var(--card); border: 1px solid var(--border);
+                    border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
+  .budget-tracker h3 { margin: 0 0 12px 0; font-size: 1.05rem; }
+  .budget-bar { height: 14px; background: #e5e7eb; border-radius: 7px;
+                overflow: hidden; margin: 8px 0; position: relative; }
+  .budget-bar > div { height: 100%; transition: width 0.3s; border-radius: 7px; }
+  .bar-ok { background: var(--green); }
+  .bar-warn { background: var(--dia); }
+  .bar-crit { background: var(--red); }
+  .budget-stats { display: flex; justify-content: space-between;
+                  font-size: 0.88rem; color: var(--muted); }
+  .view-selector { display: inline-flex; background: white; border: 1px solid var(--border);
+                   border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+  .view-selector button { border: none; background: white; padding: 8px 18px;
+                          font-size: 0.92rem; cursor: pointer; color: var(--muted);
+                          font-weight: 500; transition: all 0.15s; }
+  .view-selector button:hover { background: #f3f4f6; }
+  .view-selector button.active { background: var(--primary); color: white; }
+  .view-selector button + button { border-left: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div>
+    <h1>Dashboard Hogar</h1>
+    <div class="subtitle" id="period-label">cargando...</div>
+  </div>
+  <div class="updated" id="updated-at"></div>
+</header>
+
+<div id="empty-warning" class="warn-banner" style="display:none">
+  No se encontraron datos de consumo aun.
+</div>
+
+<div class="view-selector" id="view-selector">
+  <button data-view="dia">Dia</button>
+  <button data-view="semana">Semana</button>
+  <button data-view="periodo" class="active">Periodo</button>
+</div>
+
+<div id="alerts-container"></div>
+
+<div id="budget-tracker" class="budget-tracker" style="display:none">
+  <h3>Objetivo del periodo</h3>
+  <div class="budget-stats">
+    <span><strong id="bt-objetivo">$0</strong> objetivo mensual</span>
+    <span><strong id="bt-actual">$0</strong> a la fecha</span>
+    <span><strong id="bt-proy">$0</strong> proyectado</span>
+  </div>
+  <div class="budget-bar"><div id="bt-bar"></div></div>
+  <div style="font-size:0.85rem;color:var(--muted)" id="bt-message"></div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="label" id="lbl-consumo">Consumo del periodo</div>
+    <div class="value"><span id="kwh-total">0</span> kWh</div>
+    <div class="sub" id="kwh-projected"></div>
+  </div>
+  <div class="card">
+    <div class="label" id="lbl-costo">Costo a la fecha</div>
+    <div class="value" id="costo-actual">$0</div>
+    <div class="sub" id="costo-detalle"></div>
+  </div>
+  <div class="card">
+    <div class="label">Costo proyectado fin de periodo</div>
+    <div class="value" id="costo-proyectado">$0</div>
+    <div class="sub" id="costo-vs-anterior"></div>
+  </div>
+  <div class="card">
+    <div class="label" id="lbl-progreso">Progreso del periodo</div>
+    <div class="value" id="progreso-valor"><span id="dia-actual">0</span>/<span id="dias-total">0</span></div>
+    <div class="sub" id="progreso-sub">dias transcurridos</div>
+    <div class="progress-bar"><div id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="chart-card">
+    <h3>Consumo diario (kWh)</h3>
+    <div class="chart-wrap" id="chart-daily-wrap"><canvas id="chart-daily"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Distribucion por tramo horario</h3>
+    <div class="chart-wrap" id="chart-tramo-wrap"><canvas id="chart-tramo"></canvas></div>
+  </div>
+</div>
+
+<div class="chart-card" style="margin-bottom:24px">
+  <h3>Estado en vivo de los dispositivos</h3>
+  <div id="device-status-live" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
+  <div id="device-status-empty" style="display:none;text-align:center;padding:20px;color:var(--muted)">
+    Sin datos de estado todavia. Vuelve a ejecutar el script.
+  </div>
+</div>
+
+<div class="chart-card" style="margin-bottom:24px">
+  <h3>Consumo mensual ultimos 13 meses (boletas)</h3>
+  <div class="chart-wrap" style="height:240px"><canvas id="chart-anual"></canvas></div>
+</div>
+
+<div class="row">
+  <div class="chart-card">
+    <h3>Consumo por dispositivo</h3>
+    <div style="overflow-x:auto">
+      <table id="tabla-dispositivos">
+        <thead><tr><th>Dispositivo</th><th class="num">Noche</th><th class="num">Dia</th><th class="num">Punta</th><th class="num">Total kWh</th><th class="num">Costo CLP</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>Tarifas por tramo</h3>
+    <table id="tabla-tarifas">
+      <thead><tr><th>Tramo</th><th class="num">$/kWh</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div style="margin-top:14px; font-size:0.85rem; color:var(--muted)">
+      <strong>Cargo fijo mensual:</strong> $<span id="cargo-fijo"></span><br>
+      <strong>Periodo anterior:</strong> <span id="periodo-anterior-label"></span> - <span id="periodo-anterior-kwh"></span> kWh / $<span id="periodo-anterior-costo"></span>
+    </div>
+  </div>
+</div>
+
+<div id="no-track-info" class="info-banner" style="display:none">
+  <strong>Sin medicion de energia:</strong> <span id="no-track-list"></span>.
+</div>
+
+<footer>
+  Tarifa Enel THRF-T1 (Nunoa) | Ejecutar <code>run.bat</code> para actualizar
+</footer>
+
+</div>
+
+<script>
+const DATA = {
+  "generated_at": "2026-06-01T16:24:28",
+  "tarifa": {
+    "tipo": "THRF-T1 - Enel Distribucion",
+    "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
+    "tramos": {
+      "noche": {
+        "horas": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          23
+        ],
+        "precio_kwh": 163.57
+      },
+      "dia": {
+        "horas": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "precio_kwh": 226.39
+      },
+      "punta": {
+        "horas": [
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "precio_kwh": 289.31
+      }
+    },
+    "cargo_fijo_mensual": 843.71,
+    "comentario_calculo": "precio_kwh incluye energia + transporte + IVA + descuentos G/T. cargo_fijo_mensual = administracion (709) con IVA."
+  },
+  "periodo_actual": {
+    "inicio": "2026-05-24",
+    "fin": "2026-06-23",
+    "dias_total": 31,
+    "dias_transcurridos": 9,
+    "kwh_total": 51.85,
+    "kwh_proyectado": 178.6,
+    "costo": {
+      "energia": 11104,
+      "cargo_fijo": 253,
+      "total": 11357,
+      "desglose_tramo": {
+        "noche": {
+          "kwh": 21.5696,
+          "precio_kwh": 163.57,
+          "costo": 3528.139472
+        },
+        "dia": {
+          "kwh": 18.821549999999995,
+          "precio_kwh": 226.39,
+          "costo": 4261.010704499999
+        },
+        "punta": {
+          "kwh": 11.458850000000004,
+          "precio_kwh": 289.31,
+          "costo": 3315.159893500001
+        }
+      }
+    },
+    "costo_proyectado": 39091,
+    "per_device": {
+      "Estufa": {
+        "noche": 20.758399999999998,
+        "dia": 18.113699999999998,
+        "punta": 11.027900000000002,
+        "total": 49.9
+      },
+      "Fuente": {
+        "noche": 0.03328,
+        "dia": 0.029040000000000003,
+        "punta": 0.01768,
+        "total": 0.08
+      },
+      "Monitor": {
+        "noche": 0.03328,
+        "dia": 0.029039999999999996,
+        "punta": 0.01768,
+        "total": 0.08
+      },
+      "Calientacama": {
+        "noche": 0.74464,
+        "dia": 0.64977,
+        "punta": 0.39559000000000005,
+        "total": 1.79
+      }
+    },
+    "daily": {
+      "2026-05-24": {
+        "Estufa": 17.5,
+        "Calientacama": 0.6,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-25": {
+        "Estufa": 6.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-26": {
+        "Estufa": 4.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.03,
+        "Fuente": 0.01
+      },
+      "2026-05-27": {
+        "Estufa": 6.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.01,
+        "Fuente": 0.01
+      },
+      "2026-05-28": {
+        "Estufa": 4.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-29": {
+        "Estufa": 1.5,
+        "Calientacama": 0.2,
+        "Monitor": 0.03,
+        "Fuente": 0.01
+      },
+      "2026-05-30": {
+        "Estufa": 4.5,
+        "Calientacama": 0.2,
+        "Monitor": 0.01,
+        "Fuente": 0.01
+      },
+      "2026-05-31": {
+        "Estufa": 2.04,
+        "Calientacama": 0.7,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-06-01": {
+        "Estufa": 2.36,
+        "Calientacama": 0.09,
+        "Monitor": 0.0,
+        "Fuente": 0.0
+      }
+    },
+    "totales_tramo": {
+      "noche": 21.5696,
+      "dia": 18.821549999999995,
+      "punta": 11.458850000000004
+    }
+  },
+  "periodo_anterior": {
+    "inicio": "2026-03-24",
+    "fin": "2026-04-23",
+    "dias_total": 30,
+    "kwh_total": 113,
+    "costo": {
+      "energia": 24203,
+      "cargo_fijo": 709,
+      "total": 24912,
+      "desglose_tramo": {
+        "noche": {
+          "kwh": 47,
+          "precio_kwh": 146.74468085106383,
+          "costo": 6897
+        },
+        "dia": {
+          "kwh": 41,
+          "precio_kwh": 209.5609756097561,
+          "costo": 8592
+        },
+        "punta": {
+          "kwh": 25,
+          "precio_kwh": 272.48,
+          "costo": 6812
+        }
+      }
+    },
+    "per_device": {},
+    "totales_tramo": {
+      "noche": 47,
+      "dia": 41,
+      "punta": 25
+    },
+    "fuente": "boleta"
+  },
+  "historico_anual": [
+    {
+      "mes": "2025-04",
+      "kwh": 63
+    },
+    {
+      "mes": "2025-05",
+      "kwh": 97
+    },
+    {
+      "mes": "2025-06",
+      "kwh": 56
+    },
+    {
+      "mes": "2025-07",
+      "kwh": 245
+    },
+    {
+      "mes": "2025-08",
+      "kwh": 386
+    },
+    {
+      "mes": "2025-09",
+      "kwh": 295
+    },
+    {
+      "mes": "2025-10",
+      "kwh": 121
+    },
+    {
+      "mes": "2025-11",
+      "kwh": 106
+    },
+    {
+      "mes": "2025-12",
+      "kwh": 93
+    },
+    {
+      "mes": "2026-01",
+      "kwh": 84
+    },
+    {
+      "mes": "2026-02",
+      "kwh": 89
+    },
+    {
+      "mes": "2026-03",
+      "kwh": 72
+    },
+    {
+      "mes": "2026-04",
+      "kwh": 113
+    }
+  ],
+  "ultima_boleta": {
+    "periodo_inicio": "2026-03-24",
+    "periodo_fin": "2026-04-23",
+    "kwh_noche": 47,
+    "kwh_dia": 41,
+    "kwh_punta": 25,
+    "kwh_total": 113,
+    "costo_energia_noche": 6897,
+    "costo_energia_dia": 8592,
+    "costo_energia_punta": 6812,
+    "costo_transporte": 1902,
+    "costo_administracion": 709,
+    "costo_total": 24912,
+    "fecha_emision": "2026-04-28",
+    "fecha_vencimiento": "2026-05-14"
+  },
+  "dispositivos_tracked": [
+    "Estufa",
+    "Fuente",
+    "Monitor",
+    "Calientacama"
+  ],
+  "dispositivos_no_tracked": [
+    "Luz dormitorio",
+    "Living",
+    "Luz Living"
+  ],
+  "device_status_live": {
+    "Estufa": {
+      "id": "ebaf20a100bb6117a6jeqy",
+      "type": "SMART_PLUG",
+      "track_energy": true,
+      "switch": null,
+      "cur_power": 0,
+      "cur_voltage": 2249,
+      "cur_current": 0,
+      "add_ele_total": 4,
+      "last_seen": "2026-06-01T16:24:26"
+    },
+    "Fuente": {
+      "id": "eb52127ae37539c74aog5h",
+      "type": "SMART_PLUG",
+      "track_energy": true,
+      "switch": true,
+      "cur_power": 0,
+      "cur_voltage": 2252,
+      "cur_current": 0,
+      "add_ele_total": 1,
+      "last_seen": "2026-06-01T16:24:26"
+    },
+    "Monitor": {
+      "id": "eb61b2b660407ab168f0p7",
+      "type": "SMART_PLUG",
+      "track_energy": true,
+      "switch": null,
+      "cur_power": 0,
+      "cur_voltage": 2256,
+      "cur_current": 0,
+      "add_ele_total": 6,
+      "last_seen": "2026-06-01T16:24:26"
+    },
+    "Calientacama": {
+      "id": "eb790c104bcea8bc0asowa",
+      "type": "SMART_PLUG",
+      "track_energy": true,
+      "switch": null,
+      "cur_power": 0,
+      "cur_voltage": 2235,
+      "cur_current": 0,
+      "add_ele_total": 10,
+      "last_seen": "2026-06-01T16:24:27"
+    },
+    "Luz dormitorio": {
+      "id": "eba2561a7e73970687wtue",
+      "type": "LAMP",
+      "track_energy": false,
+      "switch": null,
+      "bright": 1000,
+      "work_mode": "white",
+      "last_seen": "2026-06-01T16:24:27"
+    },
+    "Living": {
+      "id": "eb3124771418f14447iepg",
+      "type": "LAMP",
+      "track_energy": false,
+      "switch": null,
+      "bright": 1000,
+      "work_mode": "white",
+      "last_seen": "2026-06-01T16:24:27"
+    },
+    "Luz Living": {
+      "id": "ebd14767750399bec58aoj",
+      "type": "LAMP",
+      "track_energy": false,
+      "switch": null,
+      "bright": 1000,
+      "work_mode": "white",
+      "last_seen": "2026-06-01T16:24:28"
+    }
+  },
+  "modo": "muestreo_periodico+manual",
+  "distribucion_tramos": {
+    "noche": 0.416,
+    "dia": 0.363,
+    "punta": 0.221
+  },
+  "presupuesto": {
+    "comentario": "Limites para alertas de sobreconsumo. Si se superan, el dashboard muestra alertas visuales.",
+    "objetivo_mensual_clp": 55000,
+    "umbral_proyeccion_pct": 90,
+    "umbral_proyeccion_critico_pct": 100,
+    "kwh_dia_max_total": 8.43,
+    "umbral_dia_pct": 100,
+    "por_dispositivo": {
+      "Estufa": {
+        "kwh_dia_max": 5.0,
+        "comentario": "Termoventilador 1800W - principal foco de ahorro"
+      },
+      "Calientacama": {
+        "kwh_dia_max": 1.0
+      },
+      "Monitor": {
+        "kwh_dia_max": 0.5
+      },
+      "Fuente": {
+        "kwh_dia_max": 0.1
+      }
+    }
+  },
+  "alertas": [
+    {
+      "nivel": "advertencia",
+      "tipo": "dispositivo",
+      "dispositivo": "Estufa",
+      "titulo": "Estufa: promedio diario sobre limite",
+      "detalle": "Promedio 5.54 kWh/dia (limite: 5.0 kWh/dia)."
+    }
+  ]
+};
+let currentView = (typeof localStorage !== "undefined" && localStorage.getItem("dh_view")) || "periodo";
+let chartDaily = null, chartTramo = null, chartAnual = null;
+
+function fmtCLP(n) { return n == null ? "-" : "$" + Math.round(n).toLocaleString("es-CL"); }
+function fmtKwh(n) { return n == null ? "0" : Number(n).toLocaleString("es-CL", {minimumFractionDigits: 3, maximumFractionDigits: 3}); }
+function fmtDate(s) { if (!s) return ""; const [y,m,d] = s.split("-"); return `${d}-${m}-${y}`; }
+
+function describeHoras(horas) {
+  if (!horas || horas.length === 0) return "";
+  const sorted = [...horas].sort((a,b)=>a-b);
+  let isContig = true;
+  for (let i = 1; i < sorted.length; i++) if (sorted[i] !== sorted[i-1]+1) { isContig = false; break; }
+  if (isContig) return `${sorted[0]}h - ${sorted[sorted.length-1]+1}h`;
+  const altas = sorted.filter(h => h >= 12);
+  const bajas = sorted.filter(h => h < 12);
+  const start = altas.length ? Math.min(...altas) : sorted[0];
+  const end = bajas.length ? Math.max(...bajas) + 1 : sorted[sorted.length-1] + 1;
+  return `${start}h - ${end}h`;
+}
+
+function dayHasData(dayEntry) {
+  if (!dayEntry) return false;
+  return Object.values(dayEntry).some(v => Number(v) > 0);
+}
+
+function filterDailyByView(dailyAll, view) {
+  const days = Object.keys(dailyAll).sort();
+  if (days.length === 0) return {};
+  if (view === "dia") {
+    // Buscar el ultimo dia con datos > 0; si no hay, devolver el ultimo dia
+    for (let i = days.length - 1; i >= 0; i--) {
+      if (dayHasData(dailyAll[days[i]])) {
+        return { [days[i]]: dailyAll[days[i]] };
+      }
+    }
+    const last = days[days.length-1];
+    return { [last]: dailyAll[last] };
+  }
+  if (view === "semana") {
+    const lastN = days.slice(-7); const out = {};
+    lastN.forEach(d => out[d] = dailyAll[d]); return out;
+  }
+  return dailyAll;
+}
+
+function computeStatsFromDaily(filteredDaily, distribucion) {
+  const days = Object.keys(filteredDaily).sort();
+  const perDevice = {};
+  const tramos = { noche: 0, dia: 0, punta: 0 };
+  const dist = distribucion || { noche: 0.416, dia: 0.363, punta: 0.221 };
+  let total = 0;
+  for (const d of days) {
+    const devs = filteredDaily[d] || {};
+    for (const [name, kwh] of Object.entries(devs)) {
+      perDevice[name] = perDevice[name] || { noche: 0, dia: 0, punta: 0, total: 0 };
+      perDevice[name].total += kwh;
+      perDevice[name].noche += kwh * dist.noche;
+      perDevice[name].dia   += kwh * dist.dia;
+      perDevice[name].punta += kwh * dist.punta;
+      tramos.noche += kwh * dist.noche;
+      tramos.dia   += kwh * dist.dia;
+      tramos.punta += kwh * dist.punta;
+      total += kwh;
+    }
+  }
+  return { perDevice, tramos, total, days };
+}
+
+function viewLabel(view) {
+  return view === "dia" ? "del dia" : view === "semana" ? "de la semana" : "del periodo";
+}
+
+function render() {
+  if (!DATA) { document.body.innerHTML = "<h2 style='padding:40px'>Sin datos. Ejecuta fetch_data.py</h2>"; return; }
+  const cur = DATA.periodo_actual;
+  const prev = DATA.periodo_anterior;
+  const tarifa = DATA.tarifa;
+
+  document.getElementById("period-label").textContent = `Periodo: ${fmtDate(cur.inicio)} -> ${fmtDate(cur.fin)}`;
+  document.getElementById("updated-at").textContent = "Actualizado: " + new Date(DATA.generated_at).toLocaleString("es-CL");
+
+  // Filtrar por vista
+  const filteredDaily = filterDailyByView(cur.daily || {}, currentView);
+  const stats = computeStatsFromDaily(filteredDaily, DATA.distribucion_tramos);
+  const lbl = viewLabel(currentView);
+
+  document.getElementById("lbl-consumo").textContent = `Consumo ${lbl}`;
+  document.getElementById("lbl-costo").textContent = `Costo ${lbl}`;
+  document.getElementById("kwh-total").textContent = fmtKwh(stats.total);
+
+  if (currentView === "periodo") {
+    document.getElementById("kwh-projected").textContent = `Proyectado fin de periodo: ${fmtKwh(cur.kwh_proyectado)} kWh`;
+  } else {
+    document.getElementById("kwh-projected").textContent = `${stats.days.length} dia${stats.days.length === 1 ? "" : "s"} en vista`;
+  }
+
+  const costoFiltrado = stats.tramos.noche * tarifa.tramos.noche.precio_kwh
+                      + stats.tramos.dia * tarifa.tramos.dia.precio_kwh
+                      + stats.tramos.punta * tarifa.tramos.punta.precio_kwh;
+  let cargoFijoView;
+  if (currentView === "periodo") cargoFijoView = cur.costo.cargo_fijo;
+  else if (currentView === "semana") cargoFijoView = tarifa.cargo_fijo_mensual * (Math.min(7, stats.days.length) / 30);
+  else cargoFijoView = tarifa.cargo_fijo_mensual / 30;
+
+  document.getElementById("costo-actual").textContent = fmtCLP(costoFiltrado + cargoFijoView);
+  document.getElementById("costo-detalle").textContent = `Energia ${fmtCLP(costoFiltrado)} + cargo fijo ${fmtCLP(cargoFijoView)}`;
+  document.getElementById("costo-proyectado").textContent = fmtCLP(cur.costo_proyectado);
+
+  const deltaEl = document.getElementById("costo-vs-anterior");
+  if (prev && prev.costo && prev.costo.total > 0) {
+    const delta = cur.costo_proyectado - prev.costo.total;
+    const pct = ((delta / prev.costo.total) * 100).toFixed(1);
+    deltaEl.innerHTML = (delta > 0)
+      ? `<span class="delta-up">+${fmtCLP(delta)} (${pct}%)</span> vs periodo anterior`
+      : `<span class="delta-down">${fmtCLP(delta)} (${pct}%)</span> vs periodo anterior`;
+  } else { deltaEl.textContent = "Sin comparacion"; }
+
+  // Progreso card segun vista
+  const progValor = document.getElementById("progreso-valor");
+  const progSub = document.getElementById("progreso-sub");
+  const lblProg = document.getElementById("lbl-progreso");
+  if (currentView === "periodo") {
+    lblProg.textContent = "Progreso del periodo";
+    progValor.innerHTML = `<span>${cur.dias_transcurridos}</span>/<span>${cur.dias_total}</span>`;
+    progSub.textContent = "dias transcurridos";
+    document.getElementById("progress-fill").style.width = Math.min(100, (cur.dias_transcurridos/cur.dias_total)*100) + "%";
+  } else if (currentView === "semana") {
+    lblProg.textContent = "Dias en vista";
+    progValor.textContent = stats.days.length;
+    progSub.textContent = "ultimos dias con datos";
+    document.getElementById("progress-fill").style.width = Math.min(100, (stats.days.length/7)*100) + "%";
+  } else {
+    lblProg.textContent = "Fecha mostrada";
+    const lastDay = stats.days[stats.days.length - 1];
+    progValor.textContent = lastDay ? fmtDate(lastDay) : "—";
+    progSub.textContent = stats.days.length > 0 ? "ultimo dia con consumo registrado" : "sin datos";
+    document.getElementById("progress-fill").style.width = "100%";
+  }
+
+  document.getElementById("cargo-fijo").textContent = Math.round(tarifa.cargo_fijo_mensual).toLocaleString("es-CL");
+  if (prev) {
+    document.getElementById("periodo-anterior-label").textContent = `${fmtDate(prev.inicio)} -> ${fmtDate(prev.fin)}`;
+    document.getElementById("periodo-anterior-kwh").textContent = fmtKwh(prev.kwh_total);
+    document.getElementById("periodo-anterior-costo").textContent = Math.round(prev.costo.total).toLocaleString("es-CL");
+  }
+
+  if (stats.total === 0) document.getElementById("empty-warning").style.display = "block";
+  else document.getElementById("empty-warning").style.display = "none";
+
+  // Tabla tarifas
+  const tbodyTar = document.querySelector("#tabla-tarifas tbody");
+  tbodyTar.innerHTML = "";
+  for (const [key, label, cls] of [["noche","Noche","tramo-noche"],["dia","Dia","tramo-dia"],["punta","Punta","tramo-punta"]]) {
+    const tr = document.createElement("tr");
+    const horasStr = describeHoras(tarifa.tramos[key].horas);
+    tr.innerHTML = `<td><span class="tramo-pill ${cls}">${label}</span> <span style="color:var(--muted);font-size:0.85rem">${horasStr}</span></td>
+                    <td class="num">$${tarifa.tramos[key].precio_kwh.toLocaleString("es-CL", {maximumFractionDigits:2})}</td>`;
+    tbodyTar.appendChild(tr);
+  }
+
+  // Tabla dispositivos
+  const tbodyDev = document.querySelector("#tabla-dispositivos tbody");
+  tbodyDev.innerHTML = "";
+  const devs = Object.entries(stats.perDevice);
+  if (devs.length === 0) {
+    tbodyDev.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Sin datos de consumo ${lbl}.</td></tr>`;
+  } else {
+    devs.sort((a,b) => (b[1].total||0) - (a[1].total||0));
+    for (const [name, d] of devs) {
+      const costo = (d.noche||0)*tarifa.tramos.noche.precio_kwh + (d.dia||0)*tarifa.tramos.dia.precio_kwh + (d.punta||0)*tarifa.tramos.punta.precio_kwh;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td><strong>${name}</strong></td>
+                      <td class="num">${fmtKwh(d.noche)}</td>
+                      <td class="num">${fmtKwh(d.dia)}</td>
+                      <td class="num">${fmtKwh(d.punta)}</td>
+                      <td class="num"><strong>${fmtKwh(d.total)}</strong></td>
+                      <td class="num">${fmtCLP(costo)}</td>`;
+      tbodyDev.appendChild(tr);
+    }
+  }
+
+  // No tracked info
+  if (DATA.dispositivos_no_tracked && DATA.dispositivos_no_tracked.length > 0) {
+    document.getElementById("no-track-info").style.display = "block";
+    document.getElementById("no-track-list").textContent = DATA.dispositivos_no_tracked.join(", ");
+  }
+
+  // Chart consumo diario
+  if (chartDaily) { chartDaily.destroy(); chartDaily = null; }
+  const wrap1 = document.getElementById("chart-daily-wrap");
+  wrap1.innerHTML = '<canvas id="chart-daily"></canvas>';
+  if (stats.days.length > 0) {
+    const deviceNames = Array.from(new Set(stats.days.flatMap(d => Object.keys(filteredDaily[d] || {}))));
+    const colors = ["#2563eb","#dc2626","#f59e0b","#10b981","#7c3aed","#0891b2","#db2777"];
+    chartDaily = new Chart(document.getElementById("chart-daily"), {
+      type: "bar",
+      data: {
+        labels: stats.days.map(d => d.slice(5)),
+        datasets: deviceNames.map((name, i) => ({
+          label: name,
+          data: stats.days.map(d => (filteredDaily[d] || {})[name] || 0),
+          backgroundColor: colors[i % colors.length],
+          stack: "consumo"
+        }))
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: "kWh" } } },
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 12 } } }
+      }
+    });
+  } else {
+    wrap1.innerHTML = "<div style='text-align:center;padding:60px 20px;color:var(--muted)'>Sin datos diarios.</div>";
+  }
+
+  // Chart tramo
+  if (chartTramo) { chartTramo.destroy(); chartTramo = null; }
+  const wrap2 = document.getElementById("chart-tramo-wrap");
+  wrap2.innerHTML = '<canvas id="chart-tramo"></canvas>';
+  if (stats.total > 0) {
+    chartTramo = new Chart(document.getElementById("chart-tramo"), {
+      type: "doughnut",
+      data: {
+        labels: ["Noche", "Dia", "Punta"],
+        datasets: [{
+          data: [stats.tramos.noche, stats.tramos.dia, stats.tramos.punta],
+          backgroundColor: [
+            getComputedStyle(document.documentElement).getPropertyValue("--noche"),
+            getComputedStyle(document.documentElement).getPropertyValue("--dia"),
+            getComputedStyle(document.documentElement).getPropertyValue("--punta")
+          ]
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { callbacks: { label: (ctx) => {
+            const v = ctx.parsed;
+            const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+            const pct = total ? ((v/total)*100).toFixed(1) : "0";
+            return `${ctx.label}: ${v.toFixed(3)} kWh (${pct}%)`;
+          }}}
+        }
+      }
+    });
+  } else {
+    wrap2.innerHTML = "<div style='text-align:center;padding:60px 20px;color:var(--muted)'>Sin datos para graficar.</div>";
+  }
+
+  // Alertas
+  const presupuesto = DATA.presupuesto;
+  const alertas = DATA.alertas || [];
+  const alertContainer = document.getElementById("alerts-container");
+  alertContainer.innerHTML = "";
+  const iconMap = { critico: "⚠️", advertencia: "⚠", ok: "✅" };
+  if (alertas.length > 0) {
+    for (const a of alertas) {
+      const div = document.createElement("div");
+      div.className = `alert-card alert-${a.nivel}`;
+      div.innerHTML = `<div class="alert-icon">${iconMap[a.nivel] || "•"}</div>
+                       <div style="flex:1"><div class="alert-title">${a.titulo}</div>
+                       <div class="alert-detail">${a.detalle}</div></div>`;
+      alertContainer.appendChild(div);
+    }
+  } else if (presupuesto) {
+    const div = document.createElement("div");
+    div.className = "alert-card alert-ok";
+    div.innerHTML = `<div class="alert-icon">✓</div>
+                     <div style="flex:1"><div class="alert-title">Todo bajo control</div>
+                     <div class="alert-detail">Estas dentro del presupuesto.</div></div>`;
+    alertContainer.appendChild(div);
+  }
+
+  // Budget tracker
+  if (presupuesto) {
+    const tracker = document.getElementById("budget-tracker");
+    tracker.style.display = "block";
+    const objetivo = presupuesto.objetivo_mensual_clp;
+    const actual = cur.costo.total;
+    const proy = cur.costo_proyectado;
+    document.getElementById("bt-objetivo").textContent = fmtCLP(objetivo);
+    document.getElementById("bt-actual").textContent = fmtCLP(actual);
+    document.getElementById("bt-proy").textContent = fmtCLP(proy);
+    const pct = Math.min(100, (proy / objetivo) * 100);
+    const bar = document.getElementById("bt-bar");
+    bar.style.width = pct + "%";
+    bar.className = pct >= 100 ? "bar-crit" : pct >= 80 ? "bar-warn" : "bar-ok";
+    const msg = document.getElementById("bt-message");
+    if (proy > objetivo) {
+      msg.innerHTML = `<span style="color:var(--red)">${fmtCLP(proy - objetivo)} sobre el objetivo (${pct.toFixed(0)}%)</span>`;
+    } else {
+      msg.textContent = `Margen: ${fmtCLP(objetivo - proy)} (${pct.toFixed(0)}% utilizado)`;
+    }
+  }
+
+  // Estado en vivo
+  const liveStatus = DATA.device_status_live || {};
+  const liveContainer = document.getElementById("device-status-live");
+  liveContainer.innerHTML = "";
+  const liveEntries = Object.entries(liveStatus);
+  if (liveEntries.length === 0) {
+    document.getElementById("device-status-empty").style.display = "block";
+  } else {
+    document.getElementById("device-status-empty").style.display = "none";
+    liveEntries.sort((a, b) => {
+      const [na, da] = a, [nb, db] = b;
+      if (da.track_energy !== db.track_energy) return da.track_energy ? -1 : 1;
+      const aOn = da.switch ? 1 : 0, bOn = db.switch ? 1 : 0;
+      if (aOn !== bOn) return bOn - aOn;
+      return na.localeCompare(nb);
+    });
+    for (const [name, d] of liveEntries) {
+      const tile = document.createElement("div");
+      const isOn = d.switch === true;
+      const power = Number(d.cur_power) || 0;
+      const powerW = power > 100 ? power * 0.1 : power;
+      const isActive = isOn && powerW > 1;
+      let cls = "device-tile", badge, dot;
+      if (!isOn) { cls += " is-off"; badge = `<span class="badge badge-off">Apagado</span>`; dot = `<span class="pulse-dot off"></span>`; }
+      else if (isActive) { cls += " is-active"; badge = `<span class="badge badge-active">Consumiendo</span>`; dot = `<span class="pulse-dot active"></span>`; }
+      else { cls += " is-on"; badge = `<span class="badge badge-on">En espera</span>`; dot = `<span class="pulse-dot on"></span>`; }
+      let detail;
+      if (d.track_energy) {
+        const v = d.cur_voltage ? `${(Number(d.cur_voltage)*0.1).toFixed(0)}V ` : "";
+        const a = d.cur_current ? `${(Number(d.cur_current)*0.001).toFixed(2)}A` : "";
+        const totalKwh = d.add_ele_total != null ? `Acumulado: ${(Number(d.add_ele_total)*0.01).toFixed(3)} kWh` : "";
+        detail = `<div class="dev-power">${dot}${powerW.toFixed(0)} W</div>
+                  <div class="dev-detail">${v}${a}</div>
+                  <div class="dev-detail">${totalKwh}</div>`;
+      } else {
+        const bright = d.bright != null ? `Brillo: ${Math.round(Number(d.bright)/10)}%` : "";
+        detail = `<div class="dev-power" style="font-size:1.1rem">${dot}${isOn ? "ON" : "OFF"}</div>
+                  <div class="dev-detail">${bright}</div>`;
+      }
+      tile.className = cls;
+      tile.innerHTML = `<div class="dev-name">${name} ${badge}</div>
+                        <div class="dev-type">${d.type || ""}</div>
+                        ${detail}`;
+      liveContainer.appendChild(tile);
+    }
+  }
+
+  // Chart anual
+  if (chartAnual) { chartAnual.destroy(); chartAnual = null; }
+  const historico = DATA.historico_anual || [];
+  if (historico.length > 0) {
+    const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+    const labels = historico.map(h => { const [y,m]=h.mes.split("-"); return `${meses[parseInt(m,10)-1]} ${y.slice(2)}`; });
+    const values = historico.map(h => h.kwh);
+    const colorsAnual = values.map((_,i)=> i === values.length - 1 ? "#1e3a8a" : "#94a3b8");
+    chartAnual = new Chart(document.getElementById("chart-anual"), {
+      type: "bar",
+      data: { labels, datasets: [{ label: "kWh", data: values, backgroundColor: colorsAnual, borderRadius: 4 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, title: { display: true, text: "kWh" } } },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y} kWh` } } }
+      }
+    });
+  }
+}
+
+function setupViewSelector() {
+  const selector = document.getElementById("view-selector");
+  if (!selector) return;
+  selector.querySelectorAll("button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.view === currentView);
+    btn.addEventListener("click", () => {
+      currentView = btn.dataset.view;
+      try { localStorage.setItem("dh_view", currentView); } catch(e) {}
+      selector.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.view === currentView));
+      render();
+    });
+  });
+}
+
+setupViewSelector();
+render();
+</script>
+</body>
+</html>

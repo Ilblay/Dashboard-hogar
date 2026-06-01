@@ -1,0 +1,268 @@
+{
+  "tuya": {
+    "access_id": "PUT_IT_AS_GITHUB_SECRET",
+    "access_secret": "PUT_IT_AS_GITHUB_SECRET",
+    "base_url": "https://openapi.tuyaus.com",
+    "comment": "Credenciales reales viven como GitHub Secrets (TUYA_ACCESS_ID, TUYA_ACCESS_SECRET). El script las lee de env vars cuando estan disponibles."
+  },
+  "devices": [
+    {
+      "id": "ebaf20a100bb6117a6jeqy",
+      "name": "Estufa",
+      "type": "SMART_PLUG",
+      "track_energy": true
+    },
+    {
+      "id": "eba2561a7e73970687wtue",
+      "name": "Luz dormitorio",
+      "type": "LAMP",
+      "track_energy": false
+    },
+    {
+      "id": "eb3124771418f14447iepg",
+      "name": "Living",
+      "type": "LAMP",
+      "track_energy": false
+    },
+    {
+      "id": "eb52127ae37539c74aog5h",
+      "name": "Fuente",
+      "type": "SMART_PLUG",
+      "track_energy": true
+    },
+    {
+      "id": "ebd14767750399bec58aoj",
+      "name": "Luz Living",
+      "type": "LAMP",
+      "track_energy": false
+    },
+    {
+      "id": "eb61b2b660407ab168f0p7",
+      "name": "Monitor",
+      "type": "SMART_PLUG",
+      "track_energy": true
+    },
+    {
+      "id": "eb790c104bcea8bc0asowa",
+      "name": "Calientacama",
+      "type": "SMART_PLUG",
+      "track_energy": true
+    }
+  ],
+  "tariff": {
+    "tipo": "THRF-T1 - Enel Distribucion",
+    "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
+    "tramos": {
+      "noche": {
+        "horas": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          23
+        ],
+        "precio_kwh": 163.57
+      },
+      "dia": {
+        "horas": [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "precio_kwh": 226.39
+      },
+      "punta": {
+        "horas": [
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "precio_kwh": 289.31
+      }
+    },
+    "cargo_fijo_mensual": 843.71,
+    "comentario_calculo": "precio_kwh incluye energia + transporte + IVA + descuentos G/T. cargo_fijo_mensual = administracion (709) con IVA."
+  },
+  "billing_period": {
+    "dia_inicio": 24,
+    "comentario": "Periodo de cuenta Enel: del 24 de un mes al 23 del siguiente."
+  },
+  "fetch_options": {
+    "scale_factor": 0.01,
+    "comentario_scale": "Tuya devuelve add_ele en distintas unidades. Probar 1.0, 0.1, 0.01, 0.001, 0.0001 si se ve raro."
+  },
+  "boletas_historicas": {
+    "comentario": "Datos reales extraidos de boletas Enel. Fallback cuando Tuya no tiene historico.",
+    "ultima_boleta": {
+      "periodo_inicio": "2026-03-24",
+      "periodo_fin": "2026-04-23",
+      "kwh_noche": 47,
+      "kwh_dia": 41,
+      "kwh_punta": 25,
+      "kwh_total": 113,
+      "costo_energia_noche": 6897,
+      "costo_energia_dia": 8592,
+      "costo_energia_punta": 6812,
+      "costo_transporte": 1902,
+      "costo_administracion": 709,
+      "costo_total": 24912,
+      "fecha_emision": "2026-04-28",
+      "fecha_vencimiento": "2026-05-14"
+    },
+    "consumo_mensual_13m": [
+      {
+        "mes": "2025-04",
+        "kwh": 63
+      },
+      {
+        "mes": "2025-05",
+        "kwh": 97
+      },
+      {
+        "mes": "2025-06",
+        "kwh": 56
+      },
+      {
+        "mes": "2025-07",
+        "kwh": 245
+      },
+      {
+        "mes": "2025-08",
+        "kwh": 386
+      },
+      {
+        "mes": "2025-09",
+        "kwh": 295
+      },
+      {
+        "mes": "2025-10",
+        "kwh": 121
+      },
+      {
+        "mes": "2025-11",
+        "kwh": 106
+      },
+      {
+        "mes": "2025-12",
+        "kwh": 93
+      },
+      {
+        "mes": "2026-01",
+        "kwh": 84
+      },
+      {
+        "mes": "2026-02",
+        "kwh": 89
+      },
+      {
+        "mes": "2026-03",
+        "kwh": 72
+      },
+      {
+        "mes": "2026-04",
+        "kwh": 113
+      }
+    ]
+  },
+  "consumo_diario_manual": {
+    "comentario": "kWh por dia y dispositivo extraidos manualmente de la app Smart Life. Se usa cuando la API /statistics no esta disponible.",
+    "distribucion_tramos": {
+      "noche": 0.416,
+      "dia": 0.363,
+      "punta": 0.221
+    },
+    "comentario_distribucion": "Proporcion estimada de cada tramo basada en boleta Mar-Abr 2026 (47/41/25 kWh sobre 113 total).",
+    "datos": {
+      "2026-05-24": {
+        "Estufa": 17.5,
+        "Calientacama": 0.6,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-25": {
+        "Estufa": 6.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-26": {
+        "Estufa": 4.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.03,
+        "Fuente": 0.01
+      },
+      "2026-05-27": {
+        "Estufa": 6.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.01,
+        "Fuente": 0.01
+      },
+      "2026-05-28": {
+        "Estufa": 4.5,
+        "Calientacama": 0.0,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-05-29": {
+        "Estufa": 1.5,
+        "Calientacama": 0.2,
+        "Monitor": 0.03,
+        "Fuente": 0.01
+      },
+      "2026-05-30": {
+        "Estufa": 4.5,
+        "Calientacama": 0.2,
+        "Monitor": 0.01,
+        "Fuente": 0.01
+      },
+      "2026-05-31": {
+        "Estufa": 2.04,
+        "Calientacama": 0.7,
+        "Monitor": 0.0,
+        "Fuente": 0.01
+      },
+      "2026-06-01": {
+        "Estufa": 2.36,
+        "Calientacama": 0.09,
+        "Monitor": 0.0,
+        "Fuente": 0.0
+      }
+    }
+  },
+  "presupuesto": {
+    "comentario": "Limites para alertas de sobreconsumo. Si se superan, el dashboard muestra alertas visuales.",
+    "objetivo_mensual_clp": 55000,
+    "umbral_proyeccion_pct": 90,
+    "umbral_proyeccion_critico_pct": 100,
+    "kwh_dia_max_total": 8.43,
+    "umbral_dia_pct": 100,
+    "por_dispositivo": {
+      "Estufa": {
+        "kwh_dia_max": 5.0,
+        "comentario": "Termoventilador 1800W - principal foco de ahorro"
+      },
+      "Calientacama": {
+        "kwh_dia_max": 1.0
+      },
+      "Monitor": {
+        "kwh_dia_max": 0.5
+      },
+      "Fuente": {
+        "kwh_dia_max": 0.1
+      }
+    }
+  }
+}

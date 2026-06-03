@@ -227,7 +227,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-02T20:14:35",
+  "generated_at": "2026-06-03T01:18:48",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -279,18 +279,18 @@ const DATA = {
     "inicio": "2026-05-24",
     "fin": "2026-06-23",
     "dias_total": 31,
-    "dias_transcurridos": 10,
+    "dias_transcurridos": 11,
     "kwh_total": 51.879,
-    "kwh_proyectado": 160.8,
+    "kwh_proyectado": 146.2,
     "costo": {
       "energia": 11112,
-      "cargo_fijo": 281,
-      "total": 11393,
+      "cargo_fijo": 309,
+      "total": 11421,
       "desglose_tramo": {
         "noche": {
-          "kwh": 21.575755333333333,
+          "kwh": 21.57617833333333,
           "precio_kwh": 163.57,
-          "costo": 3529.146299873333
+          "costo": 3529.2154899833326
         },
         "dia": {
           "kwh": 18.821549999999995,
@@ -304,7 +304,7 @@ const DATA = {
         }
       }
     },
-    "costo_proyectado": 35291,
+    "costo_proyectado": 32159,
     "per_device": {
       "Estufa": {
         "noche": 20.76455533333333,
@@ -325,15 +325,18 @@ const DATA = {
         "total": 0.08
       },
       "Calientacama": {
-        "noche": 0.74464,
+        "noche": 0.7450629999999999,
         "dia": 0.64977,
         "punta": 0.39559000000000005,
-        "total": 1.79
+        "total": 1.7904229999999999
       }
     },
     "daily": {
       "2026-06-02": {
         "Estufa": 0.029022000000000006
+      },
+      "2026-06-03": {
+        "Calientacama": 0.00042299999999999993
       },
       "2026-05-24": {
         "Estufa": 17.5,
@@ -391,7 +394,7 @@ const DATA = {
       }
     },
     "totales_tramo": {
-      "noche": 21.575755333333333,
+      "noche": 21.57617833333333,
       "dia": 18.821549999999995,
       "punta": 11.481716666666669
     }
@@ -517,23 +520,23 @@ const DATA = {
       "id": "ebaf20a100bb6117a6jeqy",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": true,
-      "cur_power": 16800,
-      "cur_voltage": 2203,
-      "cur_current": 7628,
-      "add_ele_total": 280,
-      "last_seen": "2026-06-02T20:14:33"
+      "switch": null,
+      "cur_power": 0,
+      "cur_voltage": 2289,
+      "cur_current": 0,
+      "add_ele_total": 159,
+      "last_seen": "2026-06-03T01:18:47"
     },
     "Fuente": {
       "id": "eb52127ae37539c74aog5h",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": true,
+      "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2235,
+      "cur_voltage": 2293,
       "cur_current": 0,
       "add_ele_total": 1,
-      "last_seen": "2026-06-02T20:14:33"
+      "last_seen": "2026-06-03T01:18:47"
     },
     "Monitor": {
       "id": "eb61b2b660407ab168f0p7",
@@ -541,21 +544,21 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2215,
+      "cur_voltage": 2294,
       "cur_current": 0,
       "add_ele_total": 6,
-      "last_seen": "2026-06-02T20:14:33"
+      "last_seen": "2026-06-03T01:18:47"
     },
     "Calientacama": {
       "id": "eb790c104bcea8bc0asowa",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": null,
-      "cur_power": 0,
-      "cur_voltage": 2203,
-      "cur_current": 0,
-      "add_ele_total": 3,
-      "last_seen": "2026-06-02T20:14:34"
+      "switch": true,
+      "cur_power": 324,
+      "cur_voltage": 2289,
+      "cur_current": 154,
+      "add_ele_total": 16,
+      "last_seen": "2026-06-03T01:18:48"
     },
     "Luz dormitorio": {
       "id": "eba2561a7e73970687wtue",
@@ -564,7 +567,7 @@ const DATA = {
       "switch": true,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-02T20:14:34"
+      "last_seen": "2026-06-03T01:18:48"
     },
     "Living": {
       "id": "eb3124771418f14447iepg",
@@ -573,7 +576,7 @@ const DATA = {
       "switch": true,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-02T20:14:34"
+      "last_seen": "2026-06-03T01:18:48"
     },
     "Luz Living": {
       "id": "ebd14767750399bec58aoj",
@@ -582,7 +585,7 @@ const DATA = {
       "switch": null,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-02T20:14:35"
+      "last_seen": "2026-06-03T01:18:48"
     }
   },
   "modo": "muestreo_periodico+manual",

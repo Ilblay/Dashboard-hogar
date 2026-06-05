@@ -1179,6 +1179,38 @@
         "cur_voltage": 2234,
         "cur_current": 0,
         "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:23",
+        "add_ele": 117,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:38",
+        "add_ele": 117,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:54",
+        "add_ele": 117,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:45:10",
+        "add_ele": 117,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": null
       }
     ],
     "eb52127ae37539c74aog5h": [
@@ -2331,6 +2363,38 @@
         "add_ele": 1,
         "cur_power": 0,
         "cur_voltage": 2243,
+        "cur_current": 0,
+        "switch": true
+      },
+      {
+        "t": "2026-06-05T11:44:23",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2264,
+        "cur_current": 0,
+        "switch": true
+      },
+      {
+        "t": "2026-06-05T11:44:39",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2264,
+        "cur_current": 0,
+        "switch": true
+      },
+      {
+        "t": "2026-06-05T11:44:54",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2264,
+        "cur_current": 0,
+        "switch": true
+      },
+      {
+        "t": "2026-06-05T11:45:10",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2264,
         "cur_current": 0,
         "switch": true
       }
@@ -3487,6 +3551,38 @@
         "cur_voltage": 2248,
         "cur_current": 0,
         "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:23",
+        "add_ele": 4,
+        "cur_power": 0,
+        "cur_voltage": 2223,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:39",
+        "add_ele": 4,
+        "cur_power": 0,
+        "cur_voltage": 2223,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:54",
+        "add_ele": 4,
+        "cur_power": 0,
+        "cur_voltage": 2223,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:45:10",
+        "add_ele": 4,
+        "cur_power": 0,
+        "cur_voltage": 2223,
+        "cur_current": 0,
+        "switch": null
       }
     ],
     "eb790c104bcea8bc0asowa": [
@@ -4641,6 +4737,38 @@
         "cur_voltage": 2260,
         "cur_current": 151,
         "switch": true
+      },
+      {
+        "t": "2026-06-05T11:44:23",
+        "add_ele": 11,
+        "cur_power": 0,
+        "cur_voltage": 2244,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:39",
+        "add_ele": 11,
+        "cur_power": 0,
+        "cur_voltage": 2244,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:44:54",
+        "add_ele": 11,
+        "cur_power": 0,
+        "cur_voltage": 2244,
+        "cur_current": 0,
+        "switch": null
+      },
+      {
+        "t": "2026-06-05T11:45:10",
+        "add_ele": 11,
+        "cur_power": 0,
+        "cur_voltage": 2244,
+        "cur_current": 0,
+        "switch": null
       }
     ]
   }

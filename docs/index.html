@@ -227,7 +227,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-08T11:01:08",
+  "generated_at": "2026-06-08T11:54:42",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -312,11 +312,29 @@ const DATA = {
         "punta": 11.561773347222225,
         "total": 50.48741634722222
       },
+      "Luz dormitorio": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Living": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
       "Fuente": {
         "noche": 0.03328,
         "dia": 0.029040000000000003,
         "punta": 0.01768,
         "total": 0.08
+      },
+      "Luz Living": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
       },
       "Monitor": {
         "noche": 0.03328,
@@ -524,15 +542,14 @@ const DATA = {
   },
   "dispositivos_tracked": [
     "Estufa",
+    "Luz dormitorio",
+    "Living",
     "Fuente",
+    "Luz Living",
     "Monitor",
     "Calientacama"
   ],
-  "dispositivos_no_tracked": [
-    "Luz dormitorio",
-    "Living",
-    "Luz Living"
-  ],
+  "dispositivos_no_tracked": [],
   "device_status_live": {
     "Estufa": {
       "id": "ebaf20a100bb6117a6jeqy",
@@ -540,10 +557,10 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2289,
+      "cur_voltage": 2277,
       "cur_current": 0,
       "add_ele_total": 29,
-      "last_seen": "2026-06-08T11:01:07"
+      "last_seen": "2026-06-08T11:54:41"
     },
     "Fuente": {
       "id": "eb52127ae37539c74aog5h",
@@ -554,7 +571,7 @@ const DATA = {
       "cur_voltage": 2276,
       "cur_current": 0,
       "add_ele_total": 1,
-      "last_seen": "2026-06-08T11:01:07"
+      "last_seen": "2026-06-08T11:54:41"
     },
     "Monitor": {
       "id": "eb61b2b660407ab168f0p7",
@@ -562,10 +579,10 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2264,
+      "cur_voltage": 2273,
       "cur_current": 0,
       "add_ele_total": 6,
-      "last_seen": "2026-06-08T11:01:07"
+      "last_seen": "2026-06-08T11:54:41"
     },
     "Calientacama": {
       "id": "eb790c104bcea8bc0asowa",
@@ -573,37 +590,43 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2289,
+      "cur_voltage": 2268,
       "cur_current": 0,
       "add_ele_total": 16,
-      "last_seen": "2026-06-08T11:01:07"
+      "last_seen": "2026-06-08T11:54:41"
     },
     "Luz dormitorio": {
       "id": "eba2561a7e73970687wtue",
       "type": "LAMP",
-      "track_energy": false,
-      "switch": null,
+      "track_energy": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-08T11:01:08"
+      "cur_power": 0,
+      "wattage_nominal": 10,
+      "last_seen": "2026-06-08T11:54:42"
     },
     "Living": {
       "id": "eb3124771418f14447iepg",
       "type": "LAMP",
-      "track_energy": false,
-      "switch": null,
+      "track_energy": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-08T11:01:08"
+      "cur_power": 0,
+      "wattage_nominal": 10,
+      "last_seen": "2026-06-08T11:54:42"
     },
     "Luz Living": {
       "id": "ebd14767750399bec58aoj",
       "type": "LAMP",
-      "track_energy": false,
-      "switch": null,
+      "track_energy": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "last_seen": "2026-06-08T11:01:08"
+      "cur_power": 0,
+      "wattage_nominal": 10,
+      "last_seen": "2026-06-08T11:54:42"
     }
   },
   "modo": "muestreo_periodico+manual",
@@ -631,6 +654,15 @@ const DATA = {
         "kwh_dia_max": 0.5
       },
       "Fuente": {
+        "kwh_dia_max": 0.1
+      },
+      "Luz dormitorio": {
+        "kwh_dia_max": 0.1
+      },
+      "Living": {
+        "kwh_dia_max": 0.1
+      },
+      "Luz Living": {
         "kwh_dia_max": 0.1
       }
     }

@@ -1,0 +1,96 @@
+Dashboard Hogar - Plan B (muestreo via /status)
+  Trackeando 4 dispositivos.
+  Periodo actual: 2026-05-24 -> 2026-06-23
+  Muestreo: 4 ciclos separados por 15s (~60s total)
+  -> Estufa 2
+     status completo:
+       switch_1 = False
+       countdown_1 = 0
+       add_ele = 82
+       cur_current = 0
+       cur_power = 0
+       cur_voltage = 2301
+       voltage_coe = 589
+       electric_coe = 28277
+       power_coe = 15400
+       electricity_coe = 2710
+       fault = 0
+       relay_status = last
+       light_mode = relay
+       child_lock = False
+       cycle_time = 
+       random_time = 
+       switch_inching = 
+     add_ele: 82 | cur_power: 0 W
+  -> Fuente
+     status completo:
+       switch_1 = True
+       countdown_1 = 0
+       add_ele = 1
+       cur_current = 0
+       cur_power = 0
+       cur_voltage = 2289
+       voltage_coe = 562
+       electric_coe = 27405
+       power_coe = 15029
+       electricity_coe = 2770
+       fault = 0
+       relay_status = last
+       light_mode = relay
+       child_lock = False
+       cycle_time = 
+       random_time = 
+       switch_inching = 
+     add_ele: 1 | cur_power: 0 W
+  -> Monitor
+     status completo:
+       switch_1 = False
+       countdown_1 = 0
+       add_ele = 9
+       cur_current = 0
+       cur_power = 0
+       cur_voltage = 2268
+       voltage_coe = 560
+       electric_coe = 27216
+       power_coe = 14874
+       electricity_coe = 2800
+       fault = 0
+       relay_status = last
+       light_mode = relay
+       child_lock = False
+       cycle_time = 
+       random_time = 
+       switch_inching = 
+     add_ele: 9 | cur_power: 0 W
+  -> Estufa
+     status completo:
+       switch_1 = False
+       countdown_1 = 0
+       add_ele = 1
+       cur_current = 0
+       cur_power = 0
+       cur_voltage = 2285
+       voltage_coe = 560
+       electric_coe = 27297
+       power_coe = 14903
+       electricity_coe = 2800
+       fault = 0
+       relay_status = last
+       light_mode = relay
+       child_lock = False
+       cycle_time = 
+       random_time = 
+       switch_inching = 
+     add_ele: 1 | cur_power: 0 W
+  ... ciclo 2/4 (esperando 15s)
+  ... ciclo 3/4 (esperando 15s)
+  ... ciclo 4/4 (esperando 15s)
+  -> Luz dormitorio (solo estado)
+  -> Living (solo estado)
+  -> Luz Living (solo estado)
+
+  Acumulado del periodo: 35.1 kWh ($7.658)
+  Proyectado fin de periodo: $47.449 CLP
+  Alertas activas: 1
+    [advertencia] Estufa 2: promedio diario sobre limite
+  Dashboard: C:\Codes\Dashboard Hogar\dashboard.html

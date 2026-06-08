@@ -687,40 +687,8 @@ def main():
     # (Desactivado el sync de /logs porque ese endpoint no esta autorizado en plan free.
     # El consumo viene 100% del polling /status hecho arriba en el muestreo en rafaga.)
 
-    # Procesar REGISTROS MANUALES (form simplificado en el dashboard)
-    # Formato: { dispositivo, fecha, tramo, kwh }
-    # Reparte los kWh uniformemente entre las horas del tramo seleccionado
-    registros = cfg.get("registros_manuales", {}).get("entradas", [])
-    dev_name_to_id = {d["name"]: d["id"] for d in cfg["devices"]}
-    for reg in registros:
-        try:
-            dev_name = reg.get("dispositivo")
-            dev_id = dev_name_to_id.get(dev_name)
-            if not dev_id:
-                continue
-            fecha = reg.get("fecha")  # "YYYY-MM-DD"
-            tramo_nombre = reg.get("tramo", "dia")
-            kwh = float(reg.get("kwh", 0))
-            if kwh <= 0:
-                continue
-
-            # Obtener horas del tramo desde el config
-            horas_tramo = tramos_cfg.get(tramo_nombre, {}).get("horas", [])
-            if not horas_tramo:
-                continue
-
-            # Repartir kWh uniformemente entre las horas del tramo
-            kwh_por_hora = kwh / len(horas_tramo)
-            raw_por_hora = kwh_por_hora * 100  # para scale_factor 0.01
-
-            historico.setdefault("hourly", {}).setdefault(dev_id, {})
-            fecha_dt = dt.datetime.strptime(fecha, "%Y-%m-%d")
-            for h in horas_tramo:
-                # Para el tramo "noche" la hora 23 puede ser del dia anterior; usamos el mismo dia
-                hour_key = fecha_dt.strftime("%Y%m%d") + f"{h:02d}"
-                historico["hourly"][dev_id][hour_key] = historico["hourly"][dev_id].get(hour_key, 0.0) + raw_por_hora
-        except Exception as e:
-            print(f"     [warn] registro manual ignorado: {e}")
+    # Los REGISTROS MANUALES se procesan al construir el payload (no al historico)
+    # asi se aplican UNA SOLA VEZ por ejecucion y no se duplican.
 
     save_historico(historico)
 
@@ -740,6 +708,39 @@ def main():
     manual_cfg = cfg.get("consumo_diario_manual", {})
     manual_daily = manual_cfg.get("datos", {})
     distribucion = manual_cfg.get("distribucion_tramos")
+
+    # Aplicar REGISTROS MANUALES (form simplificado del dashboard) en memoria
+    # antes del aggregate. Se aplica una vez por run, NO se persiste al historico.
+    registros = cfg.get("registros_manuales", {}).get("entradas", [])
+    dev_name_to_id = {d["name"]: d["id"] for d in cfg["devices"]}
+    for reg in registros:
+        try:
+            dev_name = reg.get("dispositivo")
+            dev_id = dev_name_to_id.get(dev_name)
+            if not dev_id:
+                continue
+            fecha = reg.get("fecha")
+            tramo_nombre = reg.get("tramo", "dia")
+            kwh = float(reg.get("kwh", 0))
+            if kwh <= 0:
+                continue
+            horas_tramo = tramos_cfg.get(tramo_nombre, {}).get("horas", [])
+            if not horas_tramo:
+                continue
+            kwh_por_hora = kwh / len(horas_tramo)
+            raw_por_hora = kwh_por_hora * 100
+            fecha_dt = dt.datetime.strptime(fecha, "%Y-%m-%d")
+            for h in horas_tramo:
+                hour_key = fecha_dt.strftime("%Y%m%d") + f"{h:02d}"
+                # Solo agregar a devices_raw (memoria), no a historico (disco)
+                if cur_start.strftime("%Y%m%d") <= hour_key[:8] <= cur_end.strftime("%Y%m%d"):
+                    devices_raw_current.setdefault(dev_id, {})
+                    devices_raw_current[dev_id][hour_key] = devices_raw_current[dev_id].get(hour_key, 0.0) + raw_por_hora
+                elif prev_start.strftime("%Y%m%d") <= hour_key[:8] <= prev_end.strftime("%Y%m%d"):
+                    devices_raw_previous.setdefault(dev_id, {})
+                    devices_raw_previous[dev_id][hour_key] = devices_raw_previous[dev_id].get(hour_key, 0.0) + raw_por_hora
+        except Exception as e:
+            print(f"     [warn] registro manual ignorado: {e}")
 
     agg_cur = aggregate(devices_raw_current, cfg["devices"], tramos_cfg, scale, cur_start, cur_end,
                         manual_daily=manual_daily, distribucion=distribucion)
@@ -883,6 +884,19 @@ def main():
     if payload.get("alertas"):
         print(f"  Alertas activas: {len(payload['alertas'])}")
         for a in payload["alertas"]:
+            print(f"    [{a['nivel']}] {a['titulo']}")
+    print(f"  Dashboard: {DASHBOARD_PATH}")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except Exception as e:
+        print(f"\nERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
             print(f"    [{a['nivel']}] {a['titulo']}")
     print(f"  Dashboard: {DASHBOARD_PATH}")
     return 0

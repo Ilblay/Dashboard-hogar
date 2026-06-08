@@ -279,5 +279,9 @@
         "kwh_dia_max": 0.1
       }
     }
+  },
+  "registros_manuales": {
+    "comentario": "Registros manuales de uso de dispositivos. Cada entrada: dispositivo, fecha, hora_inicio, hora_fin, watts. Se suma al consumo total.",
+    "entradas": []
   }
 }

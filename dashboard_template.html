@@ -108,6 +108,29 @@
   .view-selector button:hover { background: #f3f4f6; }
   .view-selector button.active { background: var(--primary); color: white; }
   .view-selector button + button { border-left: 1px solid var(--border); }
+  #btn-refresh {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: all 0.15s;
+    line-height: 1.15;
+    text-align: center;
+  }
+  #btn-refresh:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(37,99,235,0.3); }
+  #btn-refresh:before { content: "↻ "; }
+  .small-fresh {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .freshness-old { color: var(--dia); font-weight: 600; }
+  .freshness-stale { color: var(--red); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -118,7 +141,14 @@
     <h1>Dashboard Hogar</h1>
     <div class="subtitle" id="period-label">cargando...</div>
   </div>
-  <div class="updated" id="updated-at"></div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <div class="updated" id="updated-at"></div>
+    <a id="btn-refresh" href="https://github.com/Ilblay/Dashboard-hogar/actions/workflows/update.yml" target="_blank" rel="noopener" title="Abre GitHub y haz click en 'Run workflow' para actualizar al instante">
+      <span>Actualizar ahora</span>
+      <span style="font-size:0.75rem;opacity:0.8">(abre GitHub)</span>
+    </a>
+    <div id="freshness" class="small-fresh"></div>
+  </div>
 </header>
 
 <div id="empty-warning" class="warn-banner" style="display:none">
@@ -132,6 +162,48 @@
 </div>
 
 <div id="alerts-container"></div>
+
+<div class="chart-card" style="margin-bottom:24px">
+  <h3>Agregar consumo manual</h3>
+  <p style="font-size:0.85rem; color:var(--muted); margin-top:0">
+    Para registrar kWh que la API no capturó (PC apagado, falla del cron). Solo necesitas
+    saber cuántos kWh consumió un dispositivo en un día y en qué tramo Enel.
+  </p>
+  <div style="display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items:end; margin-top:12px">
+    <div>
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Dispositivo</label>
+      <select id="reg-device" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)"></select>
+    </div>
+    <div>
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Fecha</label>
+      <input type="date" id="reg-fecha" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
+    <div>
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Tramo Enel</label>
+      <select id="reg-tramo" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+        <option value="noche">Noche (23-7h)</option>
+        <option value="dia" selected>Día (7-18h)</option>
+        <option value="punta">Punta (18-23h)</option>
+      </select>
+    </div>
+    <div>
+      <label style="font-size:0.78rem; color:var(--muted); display:block">kWh consumidos</label>
+      <input type="number" id="reg-kwh" value="1.0" min="0.001" step="0.01" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
+    <button id="reg-generar" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer">Generar JSON</button>
+  </div>
+  <div id="reg-output" style="display:none; margin-top:14px">
+    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:6px">
+      Copia este bloque y agrégalo a la lista <code>registros_manuales.entradas</code> de tu <code>config.json</code> en GitHub:
+    </div>
+    <pre id="reg-snippet" style="background:#1f2937; color:#e5e7eb; padding:12px; border-radius:6px; font-size:0.82rem; overflow-x:auto; line-height:1.4"></pre>
+    <div style="display:flex; gap:8px; margin-top:8px">
+      <button id="reg-copy" style="padding:6px 12px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer">Copiar al portapapeles</button>
+      <a id="reg-link" href="#" target="_blank" rel="noopener" style="padding:6px 12px; background:#6b7280; color:white; border-radius:6px; text-decoration:none">Abrir config.json en GitHub</a>
+    </div>
+    <div id="reg-resumen" style="margin-top:10px; font-size:0.88rem; color:var(--muted)"></div>
+  </div>
+</div>
 
 <div id="budget-tracker" class="budget-tracker" style="display:none">
   <h3>Objetivo del periodo</h3>
@@ -307,6 +379,30 @@ function render() {
 
   document.getElementById("period-label").textContent = `Periodo: ${fmtDate(cur.inicio)} -> ${fmtDate(cur.fin)}`;
   document.getElementById("updated-at").textContent = "Actualizado: " + new Date(DATA.generated_at).toLocaleString("es-CL");
+
+  // Indicador de "hace cuanto tiempo se actualizo"
+  function updateFreshness() {
+    const lastUpdate = new Date(DATA.generated_at);
+    const now = new Date();
+    const minutes = Math.floor((now - lastUpdate) / 60000);
+    const fresh = document.getElementById("freshness");
+    if (!fresh) return;
+    let text, cls = "";
+    if (minutes < 1) text = "hace menos de 1 min";
+    else if (minutes < 60) {
+      text = `hace ${minutes} min`;
+      if (minutes > 30) cls = "freshness-old";
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const rem = minutes % 60;
+      text = `hace ${hours}h ${rem}m`;
+      cls = "freshness-stale";
+    }
+    fresh.textContent = text;
+    fresh.className = "small-fresh " + cls;
+  }
+  updateFreshness();
+  setInterval(updateFreshness, 30000);  // recalcular cada 30s
 
   // Filtrar por vista
   const filteredDaily = filterDailyByView(cur.daily || {}, currentView);
@@ -606,6 +702,60 @@ function setupViewSelector() {
 
 setupViewSelector();
 render();
+
+// ---- Formulario de registro manual ----
+(function setupRegistroManual() {
+  if (!DATA) return;
+  const select = document.getElementById("reg-device");
+  if (!select) return;
+  // Llenar dropdown con todos los dispositivos del config
+  const allDevs = [...(DATA.dispositivos_tracked || []), ...(DATA.dispositivos_no_tracked || [])];
+  for (const name of allDevs) {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    select.appendChild(opt);
+  }
+  // Default: hoy
+  document.getElementById("reg-fecha").value = new Date().toISOString().slice(0,10);
+
+  document.getElementById("reg-generar").addEventListener("click", () => {
+    const dispositivo = select.value;
+    const fecha = document.getElementById("reg-fecha").value;
+    const tramo = document.getElementById("reg-tramo").value;
+    const kwh = parseFloat(document.getElementById("reg-kwh").value);
+    if (!dispositivo || !fecha || !tramo || !kwh || kwh <= 0) {
+      alert("Completa todos los campos correctamente");
+      return;
+    }
+    const entry = { dispositivo, fecha, tramo, kwh };
+    const snippet = JSON.stringify(entry, null, 2);
+    document.getElementById("reg-snippet").textContent = snippet + ",";
+    document.getElementById("reg-output").style.display = "block";
+
+    // Calcular costo segun tarifa del tramo
+    const tarifa = DATA.tarifa;
+    const precio = tarifa.tramos[tramo].precio_kwh;
+    const costo = kwh * precio;
+    const tramoLabel = {noche: "Noche", dia: "Día", punta: "Punta"}[tramo] || tramo;
+    document.getElementById("reg-resumen").innerHTML =
+      `Esto registrará <strong>${kwh.toFixed(3)} kWh</strong> en tramo <strong>${tramoLabel}</strong> a $${precio.toFixed(2)}/kWh ≈ <strong>$${Math.round(costo).toLocaleString("es-CL")} CLP</strong>.`;
+
+    // Link a editar config.json en GitHub
+    const repoBase = "https://github.com/Ilblay/Dashboard-hogar";
+    document.getElementById("reg-link").href = `${repoBase}/edit/main/config.json`;
+  });
+
+  document.getElementById("reg-copy").addEventListener("click", () => {
+    const txt = document.getElementById("reg-snippet").textContent;
+    navigator.clipboard.writeText(txt).then(() => {
+      const btn = document.getElementById("reg-copy");
+      const orig = btn.textContent;
+      btn.textContent = "✓ Copiado";
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  });
+})();
 </script>
 </body>
 </html>

@@ -282,6 +282,11 @@
   },
   "registros_manuales": {
     "comentario": "Registros manuales de uso de dispositivos. Cada entrada: dispositivo, fecha, hora_inicio, hora_fin, watts. Se suma al consumo total.",
-    "entradas": []
+    "entradas": [{
+  "dispositivo": "Estufa",
+  "fecha": "2026-06-06",
+  "tramo": "punta",
+  "kwh": 20.013
+},]
   }
 }

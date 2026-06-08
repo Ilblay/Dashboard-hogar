@@ -105,6 +105,40 @@ class TuyaClient:
     def get_device_info(self, device_id):
         return self.get(f"/v1.0/devices/{device_id}")
 
+    def get_device_logs(self, device_id, start_time_ms, end_time_ms, codes=None, size=100, last_row_key=""):
+        """
+        Obtiene los logs/eventos de un dispositivo entre dos timestamps (ms).
+        type=7 = data point reporting (cambios de datapoints).
+        Devuelve hasta 100 eventos por pagina; usar last_row_key para paginar.
+        """
+        path = f"/v1.0/devices/{device_id}/logs?type=7&start_time={start_time_ms}&end_time={end_time_ms}&size={size}"
+        if codes:
+            path += f"&codes={codes}"
+        if last_row_key:
+            path += f"&last_row_key={last_row_key}"
+        return self.get(path)
+
+    def fetch_all_logs(self, device_id, start_time_ms, end_time_ms, codes="cur_power,switch_1,add_ele,switch_led,bright_value,bright_value_v2", verbose=False):
+        """Pagina todos los logs del rango y devuelve lista completa de eventos."""
+        all_events = []
+        last_row_key = ""
+        max_pages = 50  # safety guard
+        for _ in range(max_pages):
+            r = self.get_device_logs(device_id, start_time_ms, end_time_ms, codes=codes, last_row_key=last_row_key)
+            if not r.get("success"):
+                if verbose:
+                    print(f"     [warn] logs: {r.get('msg', r)}")
+                break
+            result = r.get("result", {})
+            logs = result.get("logs", [])
+            all_events.extend(logs)
+            if not result.get("has_next"):
+                break
+            last_row_key = result.get("last_row_key", "")
+            if not last_row_key:
+                break
+        return all_events
+
 
 # ------------------ BILLING PERIOD ------------------
 
@@ -233,6 +267,177 @@ def sample_and_record(client, dev_id, dev_name, historico, tramos_cfg, verbose=T
     # Nota: NO usamos add_ele para sumar al historico (lo hace cur_power*tiempo arriba)
     # add_ele queda solo como dato informativo en samples para verificar consistencia
     return sample
+
+
+def sync_device_logs(client, dev_id, dev_name, historico, tramos_cfg, verbose=True, lookback_days=7, dev_type="SMART_PLUG"):
+    """
+    Pull incremental de logs de Tuya (eventos al segundo).
+    Calcula consumo desde los eventos y lo suma al historico.
+    No tiene problema con saltos del cron - los eventos siempre existen en Tuya.
+
+    historico["events"][dev_id] = lista cronologica de eventos {t, code, value}
+    historico["last_event_ts"][dev_id] = ultimo timestamp procesado
+    """
+    import time as _time
+    historico.setdefault("events", {}).setdefault(dev_id, [])
+    historico.setdefault("last_event_ts", {})
+
+    now_ms = int(_time.time() * 1000)
+    last_ts = historico["last_event_ts"].get(dev_id, 0)
+    # Si nunca procesamos antes, empezar lookback_days atras
+    start_ms = last_ts + 1 if last_ts > 0 else (now_ms - lookback_days * 24 * 3600 * 1000)
+
+    if verbose:
+        delta_h = (now_ms - start_ms) / 3600000
+        print(f"     pulling logs desde hace {delta_h:.1f}h...")
+
+    # Codes a pedir segun tipo de dispositivo
+    if dev_type == "LAMP":
+        codes = "switch_led,bright_value,bright_value_v2"
+    else:
+        codes = "cur_power,switch_1"
+    new_events = client.fetch_all_logs(dev_id, start_ms, now_ms, codes=codes, verbose=verbose)
+    if verbose:
+        print(f"     {len(new_events)} eventos nuevos recibidos")
+
+    # Tuya devuelve eventos en orden descendente (mas reciente primero). Invertir.
+    new_events.sort(key=lambda e: int(e.get("event_time", 0)))
+
+    # Agregar al historico
+    for ev in new_events:
+        historico["events"][dev_id].append({
+            "t": int(ev.get("event_time", 0)),
+            "code": ev.get("code"),
+            "value": ev.get("value"),
+            "from": ev.get("event_from"),
+        })
+
+    if new_events:
+        historico["last_event_ts"][dev_id] = max(int(e.get("event_time", 0)) for e in new_events)
+
+    # Limitar historial a ultimos 90 dias para no inflar el archivo
+    cutoff = now_ms - 90 * 24 * 3600 * 1000
+    historico["events"][dev_id] = [e for e in historico["events"][dev_id] if e["t"] >= cutoff]
+
+    return new_events
+
+
+def events_to_hourly_kwh_lamp(events_list, wattage_nominal=10):
+    """
+    Para lamparas: reconstruye el estado on/off y brillo a lo largo del tiempo,
+    y calcula consumo asumiendo potencia = wattage * (bright / 1000) durante encendida.
+    Devuelve {YYYYMMDDHH: valor_raw_para_aggregate} con scale_factor 0.01.
+    """
+    import datetime as _dt
+    # Solo eventos relevantes, ordenados
+    evs = [e for e in events_list if e.get("code") in ("switch_led", "bright_value", "bright_value_v2")]
+    evs.sort(key=lambda e: e["t"])
+    if not evs:
+        return {}
+
+    hourly = {}
+    # Estado inicial: asumimos OFF, brillo maximo (los eventos van actualizando)
+    is_on = False
+    bright = 1000
+    prev_t = None
+
+    def emit_consumption(t_start_ms, t_end_ms, power_w):
+        """Agregar consumo a hourly buckets, repartido si cruza horas."""
+        if t_end_ms <= t_start_ms or power_w <= 0:
+            return
+        # Ir hora por hora desde start hasta end
+        cur = t_start_ms
+        while cur < t_end_ms:
+            dt_cur = _dt.datetime.fromtimestamp(cur / 1000)
+            next_hour_dt = (dt_cur.replace(minute=0, second=0, microsecond=0) + _dt.timedelta(hours=1))
+            next_hour_ms = int(next_hour_dt.timestamp() * 1000)
+            slice_end = min(next_hour_ms, t_end_ms)
+            delta_s = (slice_end - cur) / 1000
+            wh = power_w * (delta_s / 3600)
+            kwh = wh / 1000
+            if kwh > 0:
+                hour_key = dt_cur.strftime("%Y%m%d%H")
+                raw_value = kwh * 100  # para scale_factor 0.01 del config
+                hourly[hour_key] = hourly.get(hour_key, 0) + raw_value
+            cur = slice_end
+
+    for ev in evs:
+        t_ms = ev["t"]
+        # Si estaba prendida desde el evento anterior, contabilizar consumo hasta ahora
+        if prev_t is not None and is_on:
+            power_w = wattage_nominal * (bright / 1000)
+            emit_consumption(prev_t, t_ms, power_w)
+
+        # Actualizar estado segun el evento
+        code = ev.get("code")
+        val = ev.get("value")
+        if code == "switch_led":
+            try:
+                # value puede venir como "true"/"false" o bool
+                if isinstance(val, str):
+                    is_on = val.lower() == "true"
+                else:
+                    is_on = bool(val)
+            except Exception:
+                pass
+        elif code in ("bright_value", "bright_value_v2"):
+            try:
+                b = int(val)
+                if 0 < b <= 1000:
+                    bright = b
+            except (TypeError, ValueError):
+                pass
+
+        prev_t = t_ms
+
+    return hourly
+
+
+def events_to_hourly_kwh(events_list, scale=0.0001):
+    """
+    Convierte eventos de cur_power (raw) en consumo por hora (raw para aggregate).
+    Logica: cada par consecutivo de eventos cur_power define un intervalo a potencia promedio.
+    Energia (Wh) = (P1+P2)/2 * 0.1 (factor cur_power) * duracion_segundos / 3600
+    Devuelve {YYYYMMDDHH: valor_raw_para_aggregate}
+
+    scale: cur_power viene en *0.1 W, asi que dividimos por 10. Para que el aggregate del config
+    (con scale_factor=0.01 = "raw * 0.01 = kWh") de el kWh correcto:
+      kwh = (potencia_w * tiempo_h) / 1000
+      raw_para_aggregate = kwh / scale_factor_config(0.01) = kwh * 100
+    """
+    import datetime as _dt
+    # Filtrar solo eventos de cur_power y ordenar por tiempo
+    power_events = [e for e in events_list if e.get("code") == "cur_power"]
+    power_events.sort(key=lambda e: e["t"])
+
+    hourly = {}
+    for i in range(1, len(power_events)):
+        prev = power_events[i-1]
+        curr = power_events[i]
+        try:
+            p1 = float(prev["value"]) * 0.1  # cur_power raw -> watts
+            p2 = float(curr["value"]) * 0.1
+        except (TypeError, ValueError):
+            continue
+        t1_ms = prev["t"]
+        t2_ms = curr["t"]
+        delta_s = (t2_ms - t1_ms) / 1000
+        if delta_s <= 0 or delta_s > 6 * 3600:  # skip gaps > 6h
+            continue
+        prom_w = (p1 + p2) / 2
+        wh = prom_w * (delta_s / 3600)
+        kwh = wh / 1000
+        if kwh <= 0:
+            continue
+        # Atribuir al tramo de la hora media
+        mid_ms = (t1_ms + t2_ms) / 2
+        dt_mid = _dt.datetime.fromtimestamp(mid_ms / 1000)
+        hour_key = dt_mid.strftime("%Y%m%d%H")
+        # Convertir a valor "raw para aggregate" segun scale_factor 0.01 del config
+        raw_value = kwh * 100
+        hourly[hour_key] = hourly.get(hour_key, 0) + raw_value
+
+    return hourly
 
 
 # ------------------ AGGREGATION ------------------
@@ -382,14 +587,26 @@ def main():
     # Inicializar mapa para guardar la ultima sample por dispositivo (para device_status_live)
     last_samples_map = {}
 
+    # Primero: sincronizar LOGS de Tuya (fuente primaria, no pierde data)
+    for dev in devices_track:
+        dev_id = dev["id"]; dev_name = dev["name"]
+        dev_type = dev.get("type", "SMART_PLUG")
+        print(f"  -> {dev_name} (sync logs, type={dev_type})")
+        try:
+            sync_device_logs(client, dev_id, dev_name, historico, tramos_cfg, verbose=True, dev_type=dev_type)
+        except Exception as e:
+            print(f"     [error] sync_logs: {e}")
+
+    # Segundo: muestreo en RAFAGA solo para ENCHUFES (lamparas no tienen cur_power)
+    plugs_to_sample = [d for d in devices_track if d.get("type") != "LAMP"]
     for ciclo in range(N_CICLOS):
         if ciclo > 0:
             print(f"  ... ciclo {ciclo+1}/{N_CICLOS} (esperando {INTERVALO_CICLOS}s)")
             time.sleep(INTERVALO_CICLOS)
-        for dev in devices_track:
+        for dev in plugs_to_sample:
             dev_id = dev["id"]; dev_name = dev["name"]
             if ciclo == 0:
-                print(f"  -> {dev_name}")
+                print(f"  -> {dev_name} (muestra)")
             try:
                 sample = sample_and_record(client, dev_id, dev_name, historico, tramos_cfg, verbose=(ciclo == 0))
                 if sample is not None:
@@ -411,30 +628,59 @@ def main():
             "last_seen": sample.get("t"),
         }
 
-    # Muestreo de las lamparas (solo estado switch, sin guardar historial)
-    devices_no_track = [d for d in cfg["devices"] if not d.get("track_energy")]
-    for dev in devices_no_track:
+    # Muestreo de estado de TODAS las lamparas (siempre, sin importar track_energy)
+    lamparas = [d for d in cfg["devices"] if d.get("type") == "LAMP"]
+    for dev in lamparas:
         dev_id = dev["id"]; dev_name = dev["name"]
-        print(f"  -> {dev_name} (solo estado)")
+        print(f"  -> {dev_name} (estado lampara)")
         try:
             r = client.get_status(dev_id)
             if r.get("success"):
                 status = parse_status_dict(r.get("result", []))
+                # value puede ser bool real o string
+                sw = status.get("switch_led")
+                if sw is None:
+                    sw = status.get("switch_1") or status.get("switch")
+                if isinstance(sw, str):
+                    sw = sw.lower() == "true"
+                bright = status.get("bright_value") or status.get("bright_value_v2")
+                # Calcular potencia efectiva si está prendida
+                wattage = dev.get("wattage_nominal", 10)
+                pot_efectiva = (wattage * (int(bright) / 1000)) if (sw and bright) else 0
                 device_status_live[dev_name] = {
                     "id": dev_id,
                     "type": dev.get("type", "LAMP"),
-                    "track_energy": False,
-                    "switch": status.get("switch_led") or status.get("switch_1") or status.get("switch"),
-                    "bright": status.get("bright_value") or status.get("bright_value_v2"),
+                    "track_energy": dev.get("track_energy", False),
+                    "switch": sw,
+                    "bright": bright,
                     "work_mode": status.get("work_mode"),
+                    "cur_power": pot_efectiva * 10 if pot_efectiva else 0,  # *10 para que el frontend que divide por 10 muestre los W reales
+                    "wattage_nominal": wattage,
                     "last_seen": dt.datetime.now().isoformat(timespec="seconds"),
                 }
                 if device_status_live[dev_name]["switch"] is not None:
-                    print(f"     switch: {device_status_live[dev_name]['switch']}")
+                    print(f"     switch: {sw}, bright: {bright}, potencia efectiva: {pot_efectiva:.1f}W")
             else:
                 print(f"     [warn] {r.get('msg', r)}")
         except Exception as e:
             print(f"     [error] {e}")
+
+    # Sobrescribir hourly con datos calculados desde EVENTOS (mas precisos que polling)
+    # Los events son la fuente primaria; el polling solo complementa horas sin eventos
+    for dev in devices_track:
+        dev_id = dev["id"]
+        dev_type = dev.get("type", "SMART_PLUG")
+        wattage = dev.get("wattage_nominal", 10)
+        events_list = historico.get("events", {}).get(dev_id, [])
+        if events_list:
+            if dev_type == "LAMP":
+                from_events = events_to_hourly_kwh_lamp(events_list, wattage_nominal=wattage)
+            else:
+                from_events = events_to_hourly_kwh(events_list)
+            historico.setdefault("hourly", {}).setdefault(dev_id, {})
+            for hk, val in from_events.items():
+                # Preferir valor de eventos (mas confiable)
+                historico["hourly"][dev_id][hk] = val
 
     save_historico(historico)
 
@@ -604,12 +850,6 @@ def main():
 
 if __name__ == "__main__":
     try:
-        sys.exit(main())
-    except Exception as e:
-        print(f"\nERROR: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
         sys.exit(main())
     except Exception as e:
         print(f"\nERROR: {e}")

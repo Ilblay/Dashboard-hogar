@@ -1,9 +1,9 @@
 {
   "tuya": {
-    "access_id": "PUT_IT_AS_GITHUB_SECRET",
-    "access_secret": "PUT_IT_AS_GITHUB_SECRET",
+    "access_id": "73vky38d9hgfjhxykhgv",
+    "access_secret": "347740328026425baf3880d11c5ef1c9",
     "base_url": "https://openapi.tuyaus.com",
-    "comment": "Credenciales reales viven como GitHub Secrets (TUYA_ACCESS_ID, TUYA_ACCESS_SECRET). El script las lee de env vars cuando estan disponibles."
+    "comment": "Western America Data Center (US) - region para Chile"
   },
   "devices": [
     {
@@ -16,13 +16,17 @@
       "id": "eba2561a7e73970687wtue",
       "name": "Luz dormitorio",
       "type": "LAMP",
-      "track_energy": false
+      "track_energy": true,
+      "wattage_nominal": 10,
+      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
     },
     {
       "id": "eb3124771418f14447iepg",
       "name": "Living",
       "type": "LAMP",
-      "track_energy": false
+      "track_energy": true,
+      "wattage_nominal": 10,
+      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
     },
     {
       "id": "eb52127ae37539c74aog5h",
@@ -34,7 +38,9 @@
       "id": "ebd14767750399bec58aoj",
       "name": "Luz Living",
       "type": "LAMP",
-      "track_energy": false
+      "track_energy": true,
+      "wattage_nominal": 10,
+      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
     },
     {
       "id": "eb61b2b660407ab168f0p7",
@@ -261,6 +267,15 @@
         "kwh_dia_max": 0.5
       },
       "Fuente": {
+        "kwh_dia_max": 0.1
+      },
+      "Luz dormitorio": {
+        "kwh_dia_max": 0.1
+      },
+      "Living": {
+        "kwh_dia_max": 0.1
+      },
+      "Luz Living": {
         "kwh_dia_max": 0.1
       }
     }

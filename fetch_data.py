@@ -896,17 +896,3 @@ if __name__ == "__main__":
         print(f"\nERROR: {e}")
         import traceback
         traceback.print_exc()
-        sys.exit(1)
-            print(f"    [{a['nivel']}] {a['titulo']}")
-    print(f"  Dashboard: {DASHBOARD_PATH}")
-    return 0
-
-
-if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except Exception as e:
-        print(f"\nERROR: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)

@@ -650,7 +650,7 @@ function render() {
       const tile = document.createElement("div");
       const isOn = d.switch === true;
       const power = Number(d.cur_power) || 0;
-      const powerW = power > 100 ? power * 0.1 : power;
+      const powerW = power * 0.1;
       const isActive = isOn && powerW > 1;
       let cls = "device-tile", badge, dot;
       if (!isOn) { cls += " is-off"; badge = `<span class="badge badge-off">Apagado</span>`; dot = `<span class="pulse-dot off"></span>`; }

@@ -294,6 +294,12 @@
         "fecha": "2026-06-07",
         "tramo": "punta",
         "kwh": 3.1
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-08",
+        "tramo": "punta",
+        "kwh": 3.72
       }
     ]
   }

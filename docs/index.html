@@ -186,11 +186,22 @@
         <option value="punta">Punta (18-23h)</option>
       </select>
     </div>
-    <div>
+    <div id="reg-kwh-field">
       <label style="font-size:0.78rem; color:var(--muted); display:block">kWh consumidos</label>
       <input type="number" id="reg-kwh" value="1.0" min="0.001" step="0.01" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
     </div>
+    <div id="reg-horas-field" style="display:none">
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Horas encendida</label>
+      <input type="number" id="reg-horas" value="1" min="0.1" step="0.1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
+    <div id="reg-brillo-field" style="display:none">
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Brillo %</label>
+      <input type="number" id="reg-brillo" value="100" min="1" max="100" step="1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
     <button id="reg-generar" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer">Generar JSON</button>
+  </div>
+  <div id="reg-lamp-hint" style="display:none; font-size:0.8rem; color:var(--muted); margin-top:8px">
+    Ampolleta LED: kWh se calcula como <code>wattage × (brillo/100) × horas / 1000</code>.
   </div>
   <div id="reg-output" style="display:none; margin-top:14px">
     <div style="font-size:0.85rem; color:var(--muted); margin-bottom:6px">
@@ -299,7 +310,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-09T10:57:01",
+  "generated_at": "2026-06-09T12:16:07",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -352,12 +363,12 @@ const DATA = {
     "fin": "2026-06-23",
     "dias_total": 31,
     "dias_transcurridos": 17,
-    "kwh_total": 71.863,
-    "kwh_proyectado": 131.0,
+    "kwh_total": 79.084,
+    "kwh_proyectado": 144.2,
     "costo": {
-      "energia": 16894,
+      "energia": 18958,
       "cargo_fijo": 478,
-      "total": 17372,
+      "total": 19436,
       "desglose_tramo": {
         "noche": {
           "kwh": 21.5696,
@@ -365,30 +376,30 @@ const DATA = {
           "costo": 3528.139472
         },
         "dia": {
-          "kwh": 18.821549999999995,
+          "kwh": 19.22275595833333,
           "precio_kwh": 226.39,
-          "costo": 4261.010704499999
+          "costo": 4351.839721407083
         },
         "punta": {
-          "kwh": 31.47184999999999,
+          "kwh": 38.29185,
           "precio_kwh": 289.31,
-          "costo": 9105.120923499997
+          "costo": 11078.215123499998
         }
       }
     },
-    "costo_proyectado": 31650,
+    "costo_proyectado": 35414,
     "per_device": {
       "Estufa": {
         "noche": 20.758399999999998,
-        "dia": 18.113699999999998,
-        "punta": 31.040899999999993,
-        "total": 69.91300000000001
+        "dia": 18.511178180555554,
+        "punta": 37.8609,
+        "total": 77.13047818055554
       },
       "Luz dormitorio": {
         "noche": 0.0,
-        "dia": 0.0,
+        "dia": 0.0037277777777777778,
         "punta": 0.0,
-        "total": 0.0
+        "total": 0.0037277777777777778
       },
       "Living": {
         "noche": 0.0,
@@ -422,8 +433,9 @@ const DATA = {
       }
     },
     "daily": {
-      "2026-06-06": {
-        "Estufa": 20.013
+      "2026-06-09": {
+        "Estufa": 0.3974781805555556,
+        "Luz dormitorio": 0.0037277777777777778
       },
       "2026-05-24": {
         "Estufa": 17.5,
@@ -478,12 +490,21 @@ const DATA = {
         "Calientacama": 0.09,
         "Monitor": 0.0,
         "Fuente": 0.0
+      },
+      "2026-06-06": {
+        "Estufa": 20.013
+      },
+      "2026-06-07": {
+        "Estufa": 3.1
+      },
+      "2026-06-08": {
+        "Estufa": 3.72
       }
     },
     "totales_tramo": {
       "noche": 21.5696,
-      "dia": 18.821549999999995,
-      "punta": 31.47184999999999
+      "dia": 19.22275595833333,
+      "punta": 38.29185
     }
   },
   "periodo_anterior": {
@@ -601,28 +622,58 @@ const DATA = {
     "Calientacama"
   ],
   "dispositivos_no_tracked": [],
+  "dispositivos_meta": {
+    "Estufa": {
+      "type": "SMART_PLUG",
+      "wattage_nominal": null
+    },
+    "Luz dormitorio": {
+      "type": "LAMP",
+      "wattage_nominal": 10
+    },
+    "Living": {
+      "type": "LAMP",
+      "wattage_nominal": 10
+    },
+    "Fuente": {
+      "type": "SMART_PLUG",
+      "wattage_nominal": null
+    },
+    "Luz Living": {
+      "type": "LAMP",
+      "wattage_nominal": 10
+    },
+    "Monitor": {
+      "type": "SMART_PLUG",
+      "wattage_nominal": null
+    },
+    "Calientacama": {
+      "type": "SMART_PLUG",
+      "wattage_nominal": null
+    }
+  },
   "device_status_live": {
     "Estufa": {
       "id": "ebaf20a100bb6117a6jeqy",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": null,
-      "cur_power": 0,
-      "cur_voltage": 2261,
-      "cur_current": 0,
-      "add_ele_total": 37,
-      "last_seen": "2026-06-09T10:56:58"
+      "switch": true,
+      "cur_power": 8960,
+      "cur_voltage": 2241,
+      "cur_current": 3994,
+      "add_ele_total": 149,
+      "last_seen": "2026-06-09T12:16:04"
     },
     "Luz dormitorio": {
       "id": "eba2561a7e73970687wtue",
       "type": "LAMP",
       "track_energy": true,
-      "switch": false,
+      "switch": true,
       "bright": 1000,
       "work_mode": "white",
-      "cur_power": 0,
+      "cur_power": 100.0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-09T10:57:00"
+      "last_seen": "2026-06-09T12:16:06"
     },
     "Living": {
       "id": "eb3124771418f14447iepg",
@@ -633,7 +684,7 @@ const DATA = {
       "work_mode": "white",
       "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-09T10:57:00"
+      "last_seen": "2026-06-09T12:16:06"
     },
     "Fuente": {
       "id": "eb52127ae37539c74aog5h",
@@ -644,7 +695,7 @@ const DATA = {
       "cur_voltage": 2252,
       "cur_current": 0,
       "add_ele_total": 1,
-      "last_seen": "2026-06-09T10:56:59"
+      "last_seen": "2026-06-09T12:16:05"
     },
     "Luz Living": {
       "id": "ebd14767750399bec58aoj",
@@ -655,7 +706,7 @@ const DATA = {
       "work_mode": "white",
       "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-09T10:57:01"
+      "last_seen": "2026-06-09T12:16:07"
     },
     "Monitor": {
       "id": "eb61b2b660407ab168f0p7",
@@ -663,10 +714,10 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2268,
+      "cur_voltage": 2252,
       "cur_current": 0,
       "add_ele_total": 6,
-      "last_seen": "2026-06-09T10:56:59"
+      "last_seen": "2026-06-09T12:16:06"
     },
     "Calientacama": {
       "id": "eb790c104bcea8bc0asowa",
@@ -674,10 +725,10 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2252,
+      "cur_voltage": 2285,
       "cur_current": 0,
       "add_ele_total": 2,
-      "last_seen": "2026-06-09T10:57:00"
+      "last_seen": "2026-06-09T12:16:06"
     }
   },
   "modo": "muestreo_periodico+manual",
@@ -721,16 +772,10 @@ const DATA = {
   "alertas": [
     {
       "nivel": "advertencia",
-      "tipo": "dia_total",
-      "titulo": "Consumo del 2026-06-06 supera el limite diario",
-      "detalle": "20.01 kWh > 8.43 kWh/dia (limite del presupuesto)."
-    },
-    {
-      "nivel": "advertencia",
       "tipo": "dispositivo",
       "dispositivo": "Estufa",
       "titulo": "Estufa: promedio diario sobre limite",
-      "detalle": "Promedio 6.99 kWh/dia (limite: 5.0 kWh/dia)."
+      "detalle": "Promedio 5.93 kWh/dia (limite: 5.0 kWh/dia)."
     }
   ]
 };
@@ -1074,7 +1119,7 @@ function render() {
       const tile = document.createElement("div");
       const isOn = d.switch === true;
       const power = Number(d.cur_power) || 0;
-      const powerW = power > 100 ? power * 0.1 : power;
+      const powerW = power * 0.1;
       const isActive = isOn && powerW > 1;
       let cls = "device-tile", badge, dot;
       if (!isOn) { cls += " is-off"; badge = `<span class="badge badge-off">Apagado</span>`; dot = `<span class="pulse-dot off"></span>`; }
@@ -1143,7 +1188,7 @@ render();
   if (!DATA) return;
   const select = document.getElementById("reg-device");
   if (!select) return;
-  // Llenar dropdown con todos los dispositivos del config
+  const meta = DATA.dispositivos_meta || {};
   const allDevs = [...(DATA.dispositivos_tracked || []), ...(DATA.dispositivos_no_tracked || [])];
   for (const name of allDevs) {
     const opt = document.createElement("option");
@@ -1151,32 +1196,65 @@ render();
     opt.textContent = name;
     select.appendChild(opt);
   }
-  // Default: hoy
   document.getElementById("reg-fecha").value = new Date().toISOString().slice(0,10);
+
+  const kwhField = document.getElementById("reg-kwh-field");
+  const horasField = document.getElementById("reg-horas-field");
+  const brilloField = document.getElementById("reg-brillo-field");
+  const hint = document.getElementById("reg-lamp-hint");
+
+  function isLamp(name) { return meta[name] && meta[name].type === "LAMP"; }
+  function updateFields() {
+    const lamp = isLamp(select.value);
+    kwhField.style.display = lamp ? "none" : "";
+    horasField.style.display = lamp ? "" : "none";
+    brilloField.style.display = lamp ? "" : "none";
+    hint.style.display = lamp ? "" : "none";
+  }
+  select.addEventListener("change", updateFields);
+  updateFields();
 
   document.getElementById("reg-generar").addEventListener("click", () => {
     const dispositivo = select.value;
     const fecha = document.getElementById("reg-fecha").value;
     const tramo = document.getElementById("reg-tramo").value;
-    const kwh = parseFloat(document.getElementById("reg-kwh").value);
-    if (!dispositivo || !fecha || !tramo || !kwh || kwh <= 0) {
+    if (!dispositivo || !fecha || !tramo) {
       alert("Completa todos los campos correctamente");
       return;
     }
-    const entry = { dispositivo, fecha, tramo, kwh };
+    let kwh, entry;
+    if (isLamp(dispositivo)) {
+      const horas = parseFloat(document.getElementById("reg-horas").value);
+      const brillo = parseFloat(document.getElementById("reg-brillo").value);
+      const wattage = meta[dispositivo].wattage_nominal || 10;
+      if (!horas || horas <= 0 || !brillo || brillo <= 0 || brillo > 100) {
+        alert("Horas y brillo deben ser valores válidos (brillo entre 1 y 100)");
+        return;
+      }
+      kwh = wattage * (brillo / 100) * horas / 1000;
+      entry = { dispositivo, fecha, tramo, kwh: parseFloat(kwh.toFixed(5)), horas, brillo, wattage };
+    } else {
+      kwh = parseFloat(document.getElementById("reg-kwh").value);
+      if (!kwh || kwh <= 0) {
+        alert("kWh debe ser mayor a 0");
+        return;
+      }
+      entry = { dispositivo, fecha, tramo, kwh };
+    }
     const snippet = JSON.stringify(entry, null, 2);
     document.getElementById("reg-snippet").textContent = snippet + ",";
     document.getElementById("reg-output").style.display = "block";
 
-    // Calcular costo segun tarifa del tramo
     const tarifa = DATA.tarifa;
     const precio = tarifa.tramos[tramo].precio_kwh;
     const costo = kwh * precio;
     const tramoLabel = {noche: "Noche", dia: "Día", punta: "Punta"}[tramo] || tramo;
+    const detalleLamp = isLamp(dispositivo)
+      ? ` (${entry.wattage}W × ${entry.brillo}% × ${entry.horas}h)`
+      : "";
     document.getElementById("reg-resumen").innerHTML =
-      `Esto registrará <strong>${kwh.toFixed(3)} kWh</strong> en tramo <strong>${tramoLabel}</strong> a $${precio.toFixed(2)}/kWh ≈ <strong>$${Math.round(costo).toLocaleString("es-CL")} CLP</strong>.`;
+      `Esto registrará <strong>${kwh.toFixed(4)} kWh</strong>${detalleLamp} en tramo <strong>${tramoLabel}</strong> a $${precio.toFixed(2)}/kWh ≈ <strong>$${Math.round(costo).toLocaleString("es-CL")} CLP</strong>.`;
 
-    // Link a editar config.json en GitHub
     const repoBase = "https://github.com/Ilblay/Dashboard-hogar";
     document.getElementById("reg-link").href = `${repoBase}/edit/main/config.json`;
   });

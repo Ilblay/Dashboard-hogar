@@ -186,11 +186,22 @@
         <option value="punta">Punta (18-23h)</option>
       </select>
     </div>
-    <div>
+    <div id="reg-kwh-field">
       <label style="font-size:0.78rem; color:var(--muted); display:block">kWh consumidos</label>
       <input type="number" id="reg-kwh" value="1.0" min="0.001" step="0.01" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
     </div>
+    <div id="reg-horas-field" style="display:none">
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Horas encendida</label>
+      <input type="number" id="reg-horas" value="1" min="0.1" step="0.1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
+    <div id="reg-brillo-field" style="display:none">
+      <label style="font-size:0.78rem; color:var(--muted); display:block">Brillo %</label>
+      <input type="number" id="reg-brillo" value="100" min="1" max="100" step="1" style="width:100%; padding:6px; border-radius:6px; border:1px solid var(--border)">
+    </div>
     <button id="reg-generar" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:600; cursor:pointer">Generar JSON</button>
+  </div>
+  <div id="reg-lamp-hint" style="display:none; font-size:0.8rem; color:var(--muted); margin-top:8px">
+    Ampolleta LED: kWh se calcula como <code>wattage × (brillo/100) × horas / 1000</code>.
   </div>
   <div id="reg-output" style="display:none; margin-top:14px">
     <div style="font-size:0.85rem; color:var(--muted); margin-bottom:6px">
@@ -708,7 +719,7 @@ render();
   if (!DATA) return;
   const select = document.getElementById("reg-device");
   if (!select) return;
-  // Llenar dropdown con todos los dispositivos del config
+  const meta = DATA.dispositivos_meta || {};
   const allDevs = [...(DATA.dispositivos_tracked || []), ...(DATA.dispositivos_no_tracked || [])];
   for (const name of allDevs) {
     const opt = document.createElement("option");
@@ -716,32 +727,65 @@ render();
     opt.textContent = name;
     select.appendChild(opt);
   }
-  // Default: hoy
   document.getElementById("reg-fecha").value = new Date().toISOString().slice(0,10);
+
+  const kwhField = document.getElementById("reg-kwh-field");
+  const horasField = document.getElementById("reg-horas-field");
+  const brilloField = document.getElementById("reg-brillo-field");
+  const hint = document.getElementById("reg-lamp-hint");
+
+  function isLamp(name) { return meta[name] && meta[name].type === "LAMP"; }
+  function updateFields() {
+    const lamp = isLamp(select.value);
+    kwhField.style.display = lamp ? "none" : "";
+    horasField.style.display = lamp ? "" : "none";
+    brilloField.style.display = lamp ? "" : "none";
+    hint.style.display = lamp ? "" : "none";
+  }
+  select.addEventListener("change", updateFields);
+  updateFields();
 
   document.getElementById("reg-generar").addEventListener("click", () => {
     const dispositivo = select.value;
     const fecha = document.getElementById("reg-fecha").value;
     const tramo = document.getElementById("reg-tramo").value;
-    const kwh = parseFloat(document.getElementById("reg-kwh").value);
-    if (!dispositivo || !fecha || !tramo || !kwh || kwh <= 0) {
+    if (!dispositivo || !fecha || !tramo) {
       alert("Completa todos los campos correctamente");
       return;
     }
-    const entry = { dispositivo, fecha, tramo, kwh };
+    let kwh, entry;
+    if (isLamp(dispositivo)) {
+      const horas = parseFloat(document.getElementById("reg-horas").value);
+      const brillo = parseFloat(document.getElementById("reg-brillo").value);
+      const wattage = meta[dispositivo].wattage_nominal || 10;
+      if (!horas || horas <= 0 || !brillo || brillo <= 0 || brillo > 100) {
+        alert("Horas y brillo deben ser valores válidos (brillo entre 1 y 100)");
+        return;
+      }
+      kwh = wattage * (brillo / 100) * horas / 1000;
+      entry = { dispositivo, fecha, tramo, kwh: parseFloat(kwh.toFixed(5)), horas, brillo, wattage };
+    } else {
+      kwh = parseFloat(document.getElementById("reg-kwh").value);
+      if (!kwh || kwh <= 0) {
+        alert("kWh debe ser mayor a 0");
+        return;
+      }
+      entry = { dispositivo, fecha, tramo, kwh };
+    }
     const snippet = JSON.stringify(entry, null, 2);
     document.getElementById("reg-snippet").textContent = snippet + ",";
     document.getElementById("reg-output").style.display = "block";
 
-    // Calcular costo segun tarifa del tramo
     const tarifa = DATA.tarifa;
     const precio = tarifa.tramos[tramo].precio_kwh;
     const costo = kwh * precio;
     const tramoLabel = {noche: "Noche", dia: "Día", punta: "Punta"}[tramo] || tramo;
+    const detalleLamp = isLamp(dispositivo)
+      ? ` (${entry.wattage}W × ${entry.brillo}% × ${entry.horas}h)`
+      : "";
     document.getElementById("reg-resumen").innerHTML =
-      `Esto registrará <strong>${kwh.toFixed(3)} kWh</strong> en tramo <strong>${tramoLabel}</strong> a $${precio.toFixed(2)}/kWh ≈ <strong>$${Math.round(costo).toLocaleString("es-CL")} CLP</strong>.`;
+      `Esto registrará <strong>${kwh.toFixed(4)} kWh</strong>${detalleLamp} en tramo <strong>${tramoLabel}</strong> a $${precio.toFixed(2)}/kWh ≈ <strong>$${Math.round(costo).toLocaleString("es-CL")} CLP</strong>.`;
 
-    // Link a editar config.json en GitHub
     const repoBase = "https://github.com/Ilblay/Dashboard-hogar";
     document.getElementById("reg-link").href = `${repoBase}/edit/main/config.json`;
   });

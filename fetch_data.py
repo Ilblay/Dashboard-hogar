@@ -467,11 +467,13 @@ def events_to_hourly_kwh(events_list, scale=0.0001):
 
 # ------------------ AGGREGATION ------------------
 
-def aggregate(devices_raw, devices_cfg, tramos_cfg, scale, start, end, manual_daily=None, distribucion=None):
+def aggregate(devices_raw, devices_cfg, tramos_cfg, scale, start, end, manual_daily=None, distribucion=None, registros=None):
     """
     devices_raw: {device_id: {YYYYMMDDHH: valor_raw}}  - viene del muestreo /status
     manual_daily: {fecha_iso: {nombre_dispositivo: kwh}} - viene del config (app Smart Life)
     distribucion: {noche: 0.4, dia: 0.4, punta: 0.2} - proporcion para distribuir kWh diario por tramo
+    registros: lista de {dispositivo, fecha, tramo, kwh} (registros_manuales del form).
+               Se suman SIEMPRE, incluso si la fecha esta en manual_daily.
     Si un dia tiene data manual, se usa esa. Si no, se usa la del muestreo.
     """
     device_map = {d["id"]: d for d in devices_cfg}
@@ -532,6 +534,33 @@ def aggregate(devices_raw, devices_cfg, tramos_cfg, scale, start, end, manual_da
                 tramos_totales[tramo][dev_name] = tramos_totales[tramo].get(dev_name, 0.0) + kwh_t
                 per_device[dev_name][tramo] += kwh_t
             per_device[dev_name]["total"] += kwh_total
+
+    # 3) Procesar registros_manuales (form del dashboard).
+    # Se suman SIEMPRE, sin filtrar por manual_keys (a diferencia de las muestras).
+    name_to_cfg = {d["name"]: d for d in devices_cfg}
+    for reg in (registros or []):
+        try:
+            dev_name = reg.get("dispositivo")
+            if dev_name not in name_to_cfg:
+                continue
+            d = dt.date.fromisoformat(reg.get("fecha", ""))
+            if not (start <= d <= end):
+                continue
+            tramo = reg.get("tramo", "dia")
+            if tramo not in tramos_totales:
+                continue
+            kwh = float(reg.get("kwh", 0))
+            if kwh <= 0:
+                continue
+            day_str = d.isoformat()
+            per_device.setdefault(dev_name, {"noche": 0.0, "dia": 0.0, "punta": 0.0, "total": 0.0})
+            daily.setdefault(day_str, {})
+            daily[day_str][dev_name] = daily[day_str].get(dev_name, 0.0) + kwh
+            tramos_totales[tramo][dev_name] = tramos_totales[tramo].get(dev_name, 0.0) + kwh
+            per_device[dev_name][tramo] += kwh
+            per_device[dev_name]["total"] += kwh
+        except Exception as e:
+            print(f"     [warn] registro manual ignorado: {e}")
 
     totales_tramo = {nombre: sum(devs.values()) for nombre, devs in tramos_totales.items()}
     return {"daily": daily, "tramos_totales": tramos_totales,
@@ -709,43 +738,15 @@ def main():
     manual_daily = manual_cfg.get("datos", {})
     distribucion = manual_cfg.get("distribucion_tramos")
 
-    # Aplicar REGISTROS MANUALES (form simplificado del dashboard) en memoria
-    # antes del aggregate. Se aplica una vez por run, NO se persiste al historico.
+    # REGISTROS MANUALES (form del dashboard) se pasan a aggregate() para que se
+    # sumen SIEMPRE, sin que el filtro manual_keys los descarte cuando la fecha
+    # tambien esta en consumo_diario_manual.datos.
     registros = cfg.get("registros_manuales", {}).get("entradas", [])
-    dev_name_to_id = {d["name"]: d["id"] for d in cfg["devices"]}
-    for reg in registros:
-        try:
-            dev_name = reg.get("dispositivo")
-            dev_id = dev_name_to_id.get(dev_name)
-            if not dev_id:
-                continue
-            fecha = reg.get("fecha")
-            tramo_nombre = reg.get("tramo", "dia")
-            kwh = float(reg.get("kwh", 0))
-            if kwh <= 0:
-                continue
-            horas_tramo = tramos_cfg.get(tramo_nombre, {}).get("horas", [])
-            if not horas_tramo:
-                continue
-            kwh_por_hora = kwh / len(horas_tramo)
-            raw_por_hora = kwh_por_hora * 100
-            fecha_dt = dt.datetime.strptime(fecha, "%Y-%m-%d")
-            for h in horas_tramo:
-                hour_key = fecha_dt.strftime("%Y%m%d") + f"{h:02d}"
-                # Solo agregar a devices_raw (memoria), no a historico (disco)
-                if cur_start.strftime("%Y%m%d") <= hour_key[:8] <= cur_end.strftime("%Y%m%d"):
-                    devices_raw_current.setdefault(dev_id, {})
-                    devices_raw_current[dev_id][hour_key] = devices_raw_current[dev_id].get(hour_key, 0.0) + raw_por_hora
-                elif prev_start.strftime("%Y%m%d") <= hour_key[:8] <= prev_end.strftime("%Y%m%d"):
-                    devices_raw_previous.setdefault(dev_id, {})
-                    devices_raw_previous[dev_id][hour_key] = devices_raw_previous[dev_id].get(hour_key, 0.0) + raw_por_hora
-        except Exception as e:
-            print(f"     [warn] registro manual ignorado: {e}")
 
     agg_cur = aggregate(devices_raw_current, cfg["devices"], tramos_cfg, scale, cur_start, cur_end,
-                        manual_daily=manual_daily, distribucion=distribucion)
+                        manual_daily=manual_daily, distribucion=distribucion, registros=registros)
     agg_prev = aggregate(devices_raw_previous, cfg["devices"], tramos_cfg, scale, prev_start, prev_end,
-                         manual_daily=manual_daily, distribucion=distribucion)
+                         manual_daily=manual_daily, distribucion=distribucion, registros=registros)
 
     dias_cur = (cur_end - cur_start).days + 1
     dias_prev = (prev_end - prev_start).days + 1
@@ -800,6 +801,9 @@ def main():
         "ultima_boleta": ultima_boleta,
         "dispositivos_tracked": [d["name"] for d in devices_track],
         "dispositivos_no_tracked": [d["name"] for d in cfg["devices"] if not d.get("track_energy")],
+        "dispositivos_meta": {d["name"]: {"type": d.get("type", "SMART_PLUG"),
+                                          "wattage_nominal": d.get("wattage_nominal")}
+                              for d in cfg["devices"]},
         "device_status_live": device_status_live,
         "modo": "muestreo_periodico+manual",
         "distribucion_tramos": cfg.get("consumo_diario_manual", {}).get("distribucion_tramos", {"noche": 0.416, "dia": 0.363, "punta": 0.221}),

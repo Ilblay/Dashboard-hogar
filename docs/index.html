@@ -310,7 +310,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-10T00:04:56",
+  "generated_at": "2026-06-10T04:15:37",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -371,9 +371,9 @@ const DATA = {
       "total": 19518,
       "desglose_tramo": {
         "noche": {
-          "kwh": 21.5696,
+          "kwh": 21.5700675,
           "precio_kwh": 163.57,
-          "costo": 3528.139472
+          "costo": 3528.2159409749997
         },
         "dia": {
           "kwh": 19.44371929166666,
@@ -426,10 +426,10 @@ const DATA = {
         "total": 0.08
       },
       "Calientacama": {
-        "noche": 0.74464,
+        "noche": 0.7451074999999999,
         "dia": 0.64977,
         "punta": 0.39646100000000006,
-        "total": 1.7908709999999999
+        "total": 1.7913385
       }
     },
     "daily": {
@@ -437,6 +437,9 @@ const DATA = {
         "Estufa": 0.6285721805555555,
         "Luz dormitorio": 0.006166666666666667,
         "Calientacama": 0.000871
+      },
+      "2026-06-10": {
+        "Calientacama": 0.0004674999999999999
       },
       "2026-05-24": {
         "Estufa": 17.5,
@@ -503,7 +506,7 @@ const DATA = {
       }
     },
     "totales_tramo": {
-      "noche": 21.5696,
+      "noche": 21.5700675,
       "dia": 19.44371929166666,
       "punta": 38.30529055555556
     }
@@ -660,21 +663,21 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2281,
+      "cur_voltage": 2322,
       "cur_current": 0,
-      "add_ele_total": 1,
-      "last_seen": "2026-06-10T00:04:55"
+      "add_ele_total": 28,
+      "last_seen": "2026-06-10T04:15:34"
     },
     "Luz dormitorio": {
       "id": "eba2561a7e73970687wtue",
       "type": "LAMP",
       "track_energy": true,
-      "switch": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "cur_power": 100.0,
+      "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T00:04:56"
+      "last_seen": "2026-06-10T04:15:37"
     },
     "Living": {
       "id": "eb3124771418f14447iepg",
@@ -685,7 +688,7 @@ const DATA = {
       "work_mode": "white",
       "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T00:04:56"
+      "last_seen": "2026-06-10T04:15:37"
     },
     "Fuente": {
       "id": "eb52127ae37539c74aog5h",
@@ -693,10 +696,10 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2268,
+      "cur_voltage": 2311,
       "cur_current": 0,
       "add_ele_total": 1,
-      "last_seen": "2026-06-10T00:04:55"
+      "last_seen": "2026-06-10T04:15:35"
     },
     "Luz Living": {
       "id": "ebd14767750399bec58aoj",
@@ -707,7 +710,7 @@ const DATA = {
       "work_mode": "white",
       "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T00:04:56"
+      "last_seen": "2026-06-10T04:15:37"
     },
     "Monitor": {
       "id": "eb61b2b660407ab168f0p7",
@@ -715,21 +718,21 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2252,
+      "cur_voltage": 2294,
       "cur_current": 0,
       "add_ele_total": 6,
-      "last_seen": "2026-06-10T00:04:56"
+      "last_seen": "2026-06-10T04:15:36"
     },
     "Calientacama": {
       "id": "eb790c104bcea8bc0asowa",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": null,
-      "cur_power": 0,
-      "cur_voltage": 2264,
-      "cur_current": 0,
-      "add_ele_total": 1,
-      "last_seen": "2026-06-10T00:04:56"
+      "switch": true,
+      "cur_power": 330,
+      "cur_voltage": 2307,
+      "cur_current": 154,
+      "add_ele_total": 14,
+      "last_seen": "2026-06-10T04:15:36"
     }
   },
   "modo": "muestreo_periodico+manual",
@@ -776,7 +779,7 @@ const DATA = {
       "tipo": "dispositivo",
       "dispositivo": "Estufa",
       "titulo": "Estufa: promedio diario sobre limite",
-      "detalle": "Promedio 5.95 kWh/dia (limite: 5.0 kWh/dia)."
+      "detalle": "Promedio 5.53 kWh/dia (limite: 5.0 kWh/dia)."
     }
   ]
 };

@@ -310,7 +310,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-10T22:05:48",
+  "generated_at": "2026-06-11T03:01:35",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -362,18 +362,18 @@ const DATA = {
     "inicio": "2026-05-24",
     "fin": "2026-06-23",
     "dias_total": 31,
-    "dias_transcurridos": 18,
-    "kwh_total": 87.223,
-    "kwh_proyectado": 150.2,
+    "dias_transcurridos": 19,
+    "kwh_total": 87.224,
+    "kwh_proyectado": 142.3,
     "costo": {
       "energia": 21188,
-      "cargo_fijo": 506,
-      "total": 21695,
+      "cargo_fijo": 534,
+      "total": 21723,
       "desglose_tramo": {
         "noche": {
-          "kwh": 21.5700675,
+          "kwh": 21.570492833333333,
           "precio_kwh": 163.57,
-          "costo": 3528.2159409749997
+          "costo": 3528.285512748333
         },
         "dia": {
           "kwh": 21.200988208333325,
@@ -387,7 +387,7 @@ const DATA = {
         }
       }
     },
-    "costo_proyectado": 37334,
+    "costo_proyectado": 35414,
     "per_device": {
       "Estufa": {
         "noche": 20.758399999999998,
@@ -426,10 +426,10 @@ const DATA = {
         "total": 0.08
       },
       "Calientacama": {
-        "noche": 0.7451074999999999,
+        "noche": 0.7455328333333333,
         "dia": 0.64977,
         "punta": 0.39809838888888893,
-        "total": 1.792975888888889
+        "total": 1.7934012222222222
       }
     },
     "daily": {
@@ -442,6 +442,9 @@ const DATA = {
         "Estufa": 1.7765498055555555,
         "Luz dormitorio": 0.004925,
         "Calientacama": 0.002104888888888889
+      },
+      "2026-06-11": {
+        "Calientacama": 0.0004253333333333334
       },
       "2026-05-24": {
         "Estufa": 17.5,
@@ -508,7 +511,7 @@ const DATA = {
       }
     },
     "totales_tramo": {
-      "noche": 21.5700675,
+      "noche": 21.570492833333333,
       "dia": 21.200988208333325,
       "punta": 44.452133833333335
     }
@@ -663,45 +666,45 @@ const DATA = {
       "id": "ebaf20a100bb6117a6jeqy",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": true,
-      "cur_power": 9069,
-      "cur_voltage": 2249,
-      "cur_current": 4035,
-      "add_ele_total": 150,
-      "last_seen": "2026-06-10T22:05:47"
+      "switch": null,
+      "cur_power": 0,
+      "cur_voltage": 2285,
+      "cur_current": 0,
+      "add_ele_total": 24,
+      "last_seen": "2026-06-11T03:01:34"
     },
     "Luz dormitorio": {
       "id": "eba2561a7e73970687wtue",
       "type": "LAMP",
       "track_energy": true,
-      "switch": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "cur_power": 100.0,
+      "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T22:05:48"
+      "last_seen": "2026-06-11T03:01:35"
     },
     "Living": {
       "id": "eb3124771418f14447iepg",
       "type": "LAMP",
       "track_energy": true,
-      "switch": true,
+      "switch": false,
       "bright": 1000,
       "work_mode": "white",
-      "cur_power": 100.0,
+      "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T22:05:48"
+      "last_seen": "2026-06-11T03:01:35"
     },
     "Fuente": {
       "id": "eb52127ae37539c74aog5h",
       "type": "SMART_PLUG",
       "track_energy": true,
-      "switch": true,
+      "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2252,
+      "cur_voltage": 2276,
       "cur_current": 0,
       "add_ele_total": 1,
-      "last_seen": "2026-06-10T22:05:47"
+      "last_seen": "2026-06-11T03:01:34"
     },
     "Luz Living": {
       "id": "ebd14767750399bec58aoj",
@@ -712,7 +715,7 @@ const DATA = {
       "work_mode": "white",
       "cur_power": 0,
       "wattage_nominal": 10,
-      "last_seen": "2026-06-10T22:05:48"
+      "last_seen": "2026-06-11T03:01:35"
     },
     "Monitor": {
       "id": "eb61b2b660407ab168f0p7",
@@ -720,21 +723,21 @@ const DATA = {
       "track_energy": true,
       "switch": null,
       "cur_power": 0,
-      "cur_voltage": 2240,
+      "cur_voltage": 2260,
       "cur_current": 0,
       "add_ele_total": 5,
-      "last_seen": "2026-06-10T22:05:47"
+      "last_seen": "2026-06-11T03:01:35"
     },
     "Calientacama": {
       "id": "eb790c104bcea8bc0asowa",
       "type": "SMART_PLUG",
       "track_energy": true,
       "switch": true,
-      "cur_power": 613,
-      "cur_voltage": 2231,
-      "cur_current": 273,
-      "add_ele_total": 30,
-      "last_seen": "2026-06-10T22:05:47"
+      "cur_power": 319,
+      "cur_voltage": 2264,
+      "cur_current": 152,
+      "add_ele_total": 15,
+      "last_seen": "2026-06-11T03:01:35"
     }
   },
   "modo": "muestreo_periodico+manual",
@@ -781,7 +784,7 @@ const DATA = {
       "tipo": "dispositivo",
       "dispositivo": "Estufa",
       "titulo": "Estufa: promedio diario sobre limite",
-      "detalle": "Promedio 6.09 kWh/dia (limite: 5.0 kWh/dia)."
+      "detalle": "Promedio 5.68 kWh/dia (limite: 5.0 kWh/dia)."
     }
   ]
 };

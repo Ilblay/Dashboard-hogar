@@ -178,7 +178,7 @@ def parse_status_dict(status_list):
     return {it.get("code"): it.get("value") for it in status_list if it.get("code")}
 
 
-def sample_and_record(client, dev_id, dev_name, historico, tramos_cfg, verbose=True, dev_type="SMART_PLUG", wattage_nominal=10):
+def sample_and_record(client, dev_id, dev_name, historico, verbose=True, dev_type="SMART_PLUG", wattage_nominal=10):
     """
     Pide /status, calcula consumo desde la muestra anterior y lo suma al hourly.
     Maneja DOS tipos de dispositivos:
@@ -266,25 +266,34 @@ def sample_and_record(client, dev_id, dev_name, historico, tramos_cfg, verbose=T
             t_now = dt.datetime.fromisoformat(now_iso)
             t_prev = dt.datetime.fromisoformat(last_sample["t"])
             delta_seconds = (t_now - t_prev).total_seconds()
-            # Si el intervalo es muy grande (>1h), capear para evitar sobreestimar
-            if 0 < delta_seconds < 3600:
+            # Cap a 6h para evitar sobreestimar si el dispositivo ciclo durante un gap muy largo
+            if 0 < delta_seconds <= 21600:
                 power_actual_w = float(cur_power) * 0.1
                 power_prev_w = float(last_sample["cur_power"]) * 0.1
                 power_promedio_w = (power_actual_w + power_prev_w) / 2
-                # Energia en Wh = potencia_promedio_W * tiempo_horas
-                wh = power_promedio_w * (delta_seconds / 3600)
-                kwh = wh / 1000
-                if kwh > 0.0001:  # solo registrar consumos significativos
-                    hour_key = now.strftime("%Y%m%d%H")
-                    # Guardar como kWh REAL (no aplicar scale_factor luego, asi que dividir por scale para compensar)
-                    # Mejor: guardar como Wh y aplicar scale 0.001
-                    # Pero para simplicidad: guardar valor que con scale_factor del config (0.01) de el kWh correcto
-                    # scale_factor = 0.01 -> raw * 0.01 = kWh -> raw = kwh * 100
-                    raw_value = kwh * 100
-                    historico["hourly"][dev_id][hour_key] = historico["hourly"][dev_id].get(hour_key, 0.0) + raw_value
-                    if verbose:
-                        tramo = tramo_of_hour(now.hour, tramos_cfg)
-                        print(f"     [consumo] {kwh:.4f} kWh en {delta_seconds:.0f}s (prom {power_promedio_w:.0f}W) -> tramo {tramo}")
+                # Distribuir el consumo prorrateado entre las horas que cubre el intervalo
+                # (en vez de meterlo todo en la hora actual, que sesgaba para gaps largos)
+                t = t_prev
+                total_kwh = 0.0
+                while t < t_now:
+                    hour_start = t.replace(minute=0, second=0, microsecond=0)
+                    segment_end = min(hour_start + dt.timedelta(hours=1), t_now)
+                    segment_secs = (segment_end - t).total_seconds()
+                    if segment_secs <= 0:
+                        break
+                    segment_kwh = power_promedio_w * (segment_secs / 3600) / 1000
+                    if segment_kwh > 0.0001:
+                        # scale_factor = 0.01 -> raw * 0.01 = kWh -> raw = kwh * 100
+                        raw_value = segment_kwh * 100
+                        hour_key = t.strftime("%Y%m%d%H")
+                        historico["hourly"][dev_id][hour_key] = historico["hourly"][dev_id].get(hour_key, 0.0) + raw_value
+                        total_kwh += segment_kwh
+                    t = segment_end
+                if verbose and total_kwh > 0.0001:
+                    horas_str = f"{delta_seconds/3600:.2f}h" if delta_seconds >= 3600 else f"{delta_seconds:.0f}s"
+                    print(f"     [consumo] {total_kwh:.4f} kWh en {horas_str} (prom {power_promedio_w:.0f}W)")
+            elif verbose and delta_seconds > 21600:
+                print(f"     [warn] gap de {delta_seconds/3600:.1f}h descartado (>6h)")
         except Exception as e:
             if verbose:
                 print(f"     [warn] calculo consumo: {e}")
@@ -655,7 +664,7 @@ def main():
             if ciclo == 0:
                 print(f"  -> {dev_name} (muestra, type={dev_type})")
             try:
-                sample = sample_and_record(client, dev_id, dev_name, historico, tramos_cfg,
+                sample = sample_and_record(client, dev_id, dev_name, historico,
                                            verbose=(ciclo == 0), dev_type=dev_type, wattage_nominal=wattage)
                 if sample is not None:
                     last_samples_map[dev_name] = (dev, sample)

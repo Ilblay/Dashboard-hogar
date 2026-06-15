@@ -312,6 +312,36 @@
         "fecha": "2026-06-10",
         "tramo": "dia",
         "kwh": 1.74
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-10",
+        "tramo": "punta",
+        "kwh": 6.17
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-11",
+        "tramo": "punta",
+        "kwh": 3.4
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-12",
+        "tramo": "punta",
+        "kwh": 0.06
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-13",
+        "tramo": "punta",
+        "kwh": 3.11
+      },
+      {
+        "dispositivo": "Estufa",
+        "fecha": "2026-06-14",
+        "tramo": "punta",
+        "kwh": 2.7
       }
     ]
   }

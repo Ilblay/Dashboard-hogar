@@ -151,7 +151,9 @@
       "2026062103": 1.0,
       "2026062104": 1.0,
       "2026062105": 1.0,
-      "2026062106": 0.1938888888888889
+      "2026062106": 0.9866666666666667,
+      "2026062107": 1.0,
+      "2026062108": 0.35083333333333333
     },
     "eb3124771418f14447iepg": {
       "2026061517": 0.28319444444444447,
@@ -215,7 +217,9 @@
       "2026062103": 1.0,
       "2026062104": 1.0,
       "2026062105": 1.0,
-      "2026062106": 0.1938888888888889
+      "2026062106": 0.9866666666666667,
+      "2026062107": 1.0,
+      "2026062108": 0.35083333333333333
     },
     "eb52127ae37539c74aog5h": {},
     "ebd14767750399bec58aoj": {},
@@ -328,7 +332,9 @@
       "2026062103": 3.2400000000000007,
       "2026062104": 3.2400000000000007,
       "2026062105": 3.2400000000000007,
-      "2026062106": 0.6727
+      "2026062106": 1.9684374999999998,
+      "2026062107": 1.635,
+      "2026062108": 0.5745208333333333
     }
   },
   "samples": {
@@ -6140,6 +6146,50 @@
         "bright_value": null,
         "pot_efectiva_w": null,
         "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:03",
+        "add_ele": 43,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:20",
+        "add_ele": 43,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:37",
+        "add_ele": 43,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:54",
+        "add_ele": 43,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
       }
     ],
     "eba2561a7e73970687wtue": [
@@ -11942,6 +11992,50 @@
       },
       {
         "t": "2026-06-21T06:12:26",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:03",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:20",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:37",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:55",
         "add_ele": null,
         "cur_power": 100.0,
         "cur_voltage": null,
@@ -17760,6 +17854,50 @@
         "bright_value": 1000,
         "pot_efectiva_w": 10.0,
         "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:03",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:21",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:38",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:55",
+        "add_ele": null,
+        "cur_power": 100.0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": true,
+        "bright_value": 1000,
+        "pot_efectiva_w": 10.0,
+        "dev_type": "LAMP"
       }
     ],
     "eb52127ae37539c74aog5h": [
@@ -23570,6 +23708,50 @@
         "bright_value": null,
         "pot_efectiva_w": null,
         "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:04",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": true,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:21",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": true,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:38",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": true,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:55",
+        "add_ele": 1,
+        "cur_power": 0,
+        "cur_voltage": 2281,
+        "cur_current": 0,
+        "switch": true,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
       }
     ],
     "ebd14767750399bec58aoj": [
@@ -29372,6 +29554,50 @@
       },
       {
         "t": "2026-06-21T06:12:26",
+        "add_ele": null,
+        "cur_power": 0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": false,
+        "bright_value": 1000,
+        "pot_efectiva_w": 0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:04",
+        "add_ele": null,
+        "cur_power": 0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": false,
+        "bright_value": 1000,
+        "pot_efectiva_w": 0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:21",
+        "add_ele": null,
+        "cur_power": 0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": false,
+        "bright_value": 1000,
+        "pot_efectiva_w": 0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:38",
+        "add_ele": null,
+        "cur_power": 0,
+        "cur_voltage": null,
+        "cur_current": null,
+        "switch": false,
+        "bright_value": 1000,
+        "pot_efectiva_w": 0,
+        "dev_type": "LAMP"
+      },
+      {
+        "t": "2026-06-21T08:21:55",
         "add_ele": null,
         "cur_power": 0,
         "cur_voltage": null,
@@ -35190,6 +35416,50 @@
         "bright_value": null,
         "pot_efectiva_w": null,
         "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:04",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2277,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:22",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2277,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:39",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2277,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:56",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2277,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
       }
     ],
     "eb790c104bcea8bc0asowa": [
@@ -40997,6 +41267,50 @@
         "cur_voltage": 2315,
         "cur_current": 154,
         "switch": true,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:05",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:22",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:39",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
+        "bright_value": null,
+        "pot_efectiva_w": null,
+        "dev_type": "SMART_PLUG"
+      },
+      {
+        "t": "2026-06-21T08:21:56",
+        "add_ele": 3,
+        "cur_power": 0,
+        "cur_voltage": 2273,
+        "cur_current": 0,
+        "switch": null,
         "bright_value": null,
         "pot_efectiva_w": null,
         "dev_type": "SMART_PLUG"

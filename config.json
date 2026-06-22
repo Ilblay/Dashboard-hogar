@@ -113,26 +113,22 @@
   "boletas_historicas": {
     "comentario": "Datos reales extraidos de boletas Enel. Fallback cuando Tuya no tiene historico.",
     "ultima_boleta": {
-      "periodo_inicio": "2026-03-24",
-      "periodo_fin": "2026-04-23",
-      "kwh_noche": 47,
-      "kwh_dia": 41,
-      "kwh_punta": 25,
-      "kwh_total": 113,
-      "costo_energia_noche": 6897,
-      "costo_energia_dia": 8592,
-      "costo_energia_punta": 6812,
-      "costo_transporte": 1902,
-      "costo_administracion": 709,
-      "costo_total": 24912,
-      "fecha_emision": "2026-04-28",
-      "fecha_vencimiento": "2026-05-14"
+      "periodo_inicio": "2026-04-24",
+      "periodo_fin": "2026-05-25",
+      "kwh_noche": 135,
+      "kwh_dia": 96,
+      "kwh_punta": 66,
+      "kwh_total": 297,
+      "costo_energia_noche": 19862,
+      "costo_energia_dia": 20178,
+      "costo_energia_punta": 18034,
+      "costo_transporte": 4995,
+      "costo_administracion": 713,
+      "costo_total": 63782,
+      "fecha_emision": "2026-05-28",
+      "fecha_vencimiento": "2026-06-12"
     },
     "consumo_mensual_13m": [
-      {
-        "mes": "2025-04",
-        "kwh": 63
-      },
       {
         "mes": "2025-05",
         "kwh": 97
@@ -180,6 +176,10 @@
       {
         "mes": "2026-04",
         "kwh": 113
+      },
+      {
+        "mes": "2026-05",
+        "kwh": 297
       }
     ]
   },

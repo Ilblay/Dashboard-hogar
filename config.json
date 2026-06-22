@@ -103,8 +103,8 @@
     "comentario_calculo": "precio_kwh incluye energia + transporte + IVA + descuentos G/T. cargo_fijo_mensual = administracion (709) con IVA."
   },
   "billing_period": {
-    "dia_inicio": 24,
-    "comentario": "Periodo de cuenta Enel: del 24 de un mes al 23 del siguiente."
+    "dia_inicio": 26,
+    "comentario": "Periodo de cuenta Enel: del 26 de un mes al 25 del siguiente."
   },
   "fetch_options": {
     "scale_factor": 0.01,

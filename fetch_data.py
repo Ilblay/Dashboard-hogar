@@ -247,9 +247,11 @@ def sample_and_record(client, dev_id, dev_name, historico, verbose=True, dev_typ
     samples_list = historico["samples"][dev_id]
     last_sample = samples_list[-1] if samples_list else None
     samples_list.append(sample)
-    # mantener solo ultimas 5000 muestras por dispositivo
-    if len(samples_list) > 5000:
-        del samples_list[0: len(samples_list) - 5000]
+    # Solo se usa la ultima muestra para calcular el delta de consumo.
+    # Mantener un buffer pequeno (50) evita que el archivo se infle a varios MB
+    # y genere diffs gigantes que cuelgan el editor / asistente.
+    if len(samples_list) > 50:
+        del samples_list[0: len(samples_list) - 50]
 
     if verbose:
         if add_ele is not None:
@@ -902,10 +904,4 @@ def main():
     return 0
 
 
-if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except Exception as e:
-        print(f"\nERROR: {e}")
-        import traceback
-        traceback.print_exc()
+if __name__ == "__main__"

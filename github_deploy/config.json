@@ -1,9 +1,9 @@
 {
   "tuya": {
-    "access_id": "73vky38d9hgfjhxykhgv",
-    "access_secret": "347740328026425baf3880d11c5ef1c9",
+    "access_id": "PUT_IT_AS_GITHUB_SECRET",
+    "access_secret": "PUT_IT_AS_GITHUB_SECRET",
     "base_url": "https://openapi.tuyaus.com",
-    "comment": "Western America Data Center (US) - region para Chile"
+    "comment": "Credenciales reales viven como GitHub Secrets (TUYA_ACCESS_ID, TUYA_ACCESS_SECRET). El script las lee de env vars cuando estan disponibles."
   },
   "devices": [
     {
@@ -16,17 +16,13 @@
       "id": "eba2561a7e73970687wtue",
       "name": "Luz dormitorio",
       "type": "LAMP",
-      "track_energy": true,
-      "wattage_nominal": 10,
-      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
+      "track_energy": false
     },
     {
       "id": "eb3124771418f14447iepg",
       "name": "Living",
       "type": "LAMP",
-      "track_energy": true,
-      "wattage_nominal": 10,
-      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
+      "track_energy": false
     },
     {
       "id": "eb52127ae37539c74aog5h",
@@ -38,9 +34,7 @@
       "id": "ebd14767750399bec58aoj",
       "name": "Luz Living",
       "type": "LAMP",
-      "track_energy": true,
-      "wattage_nominal": 10,
-      "comentario": "LED 10W con dimmer. Consumo = wattage * (bright/1000) durante encendida."
+      "track_energy": false
     },
     {
       "id": "eb61b2b660407ab168f0p7",
@@ -268,123 +262,7 @@
       },
       "Fuente": {
         "kwh_dia_max": 0.1
-      },
-      "Luz dormitorio": {
-        "kwh_dia_max": 0.1
-      },
-      "Living": {
-        "kwh_dia_max": 0.1
-      },
-      "Luz Living": {
-        "kwh_dia_max": 0.1
       }
     }
-  },
-  "registros_manuales": {
-    "comentario": "Registros manuales de uso de dispositivos. Cada entrada: dispositivo, fecha, hora_inicio, hora_fin, watts. Se suma al consumo total.",
-    "entradas": [
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-06",
-        "tramo": "punta",
-        "kwh": 20.013
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-07",
-        "tramo": "punta",
-        "kwh": 3.1
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-08",
-        "tramo": "punta",
-        "kwh": 3.72
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-09",
-        "tramo": "punta",
-        "kwh": 6.121
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-10",
-        "tramo": "dia",
-        "kwh": 1.74
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-10",
-        "tramo": "punta",
-        "kwh": 6.17
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-11",
-        "tramo": "punta",
-        "kwh": 3.4
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-12",
-        "tramo": "punta",
-        "kwh": 0.06
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-13",
-        "tramo": "punta",
-        "kwh": 3.11
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-14",
-        "tramo": "punta",
-        "kwh": 2.7
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-15",
-        "tramo": "punta",
-        "kwh": 6
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-16",
-        "tramo": "punta",
-        "kwh": 0.5
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-17",
-        "tramo": "punta",
-        "kwh": 3.8
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-18",
-        "tramo": "punta",
-        "kwh": 0.4
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-19",
-        "tramo": "punta",
-        "kwh": 0
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-20",
-        "tramo": "punta",
-        "kwh": 1.10
-      },
-      {
-        "dispositivo": "Estufa",
-        "fecha": "2026-06-21",
-        "tramo": "punta",
-        "kwh": 0.2
-      }
-    ]
   }
 }

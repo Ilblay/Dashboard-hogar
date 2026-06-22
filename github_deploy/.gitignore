@@ -1,0 +1,13 @@
+# Cache Python
+__pycache__/
+*.pyc
+
+# Logs locales
+data/last_run.log
+
+# Archivos de Windows
+*.bat
+Thumbs.db
+
+# Dashboard local (se genera en docs/ para GitHub Pages)
+dashboard.html

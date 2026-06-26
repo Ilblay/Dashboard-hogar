@@ -310,7 +310,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-06-25T21:34:13",
+  "generated_at": "2026-06-26T01:53:00",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -359,12 +359,91 @@ const DATA = {
     "comentario_calculo": "precio_kwh incluye energia + transporte + IVA + descuentos G/T. cargo_fijo_mensual = administracion (709) con IVA."
   },
   "periodo_actual": {
+    "inicio": "2026-06-26",
+    "fin": "2026-07-25",
+    "dias_total": 30,
+    "dias_transcurridos": 1,
+    "kwh_total": 0.0,
+    "kwh_proyectado": 0.0,
+    "costo": {
+      "energia": 0,
+      "cargo_fijo": 28,
+      "total": 28,
+      "desglose_tramo": {
+        "noche": {
+          "kwh": 0,
+          "precio_kwh": 163.57,
+          "costo": 0.0
+        },
+        "dia": {
+          "kwh": 0,
+          "precio_kwh": 226.39,
+          "costo": 0.0
+        },
+        "punta": {
+          "kwh": 0,
+          "precio_kwh": 289.31,
+          "costo": 0.0
+        }
+      }
+    },
+    "costo_proyectado": 844,
+    "per_device": {
+      "Estufa": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Luz dormitorio": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Living": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Fuente": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Luz Living": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Monitor": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      },
+      "Calientacama": {
+        "noche": 0.0,
+        "dia": 0.0,
+        "punta": 0.0,
+        "total": 0.0
+      }
+    },
+    "daily": {},
+    "totales_tramo": {
+      "noche": 0,
+      "dia": 0,
+      "punta": 0
+    }
+  },
+  "periodo_anterior": {
     "inicio": "2026-05-26",
     "fin": "2026-06-25",
     "dias_total": 31,
-    "dias_transcurridos": 31,
     "kwh_total": 129.316,
-    "kwh_proyectado": 129.3,
     "costo": {
       "energia": 33346,
       "cargo_fijo": 872,
@@ -387,7 +466,6 @@ const DATA = {
         }
       }
     },
-    "costo_proyectado": 34190,
     "per_device": {
       "Estufa": {
         "noche": 18.390514777777778,
@@ -432,228 +510,10 @@ const DATA = {
         "total": 5.133784986111111
       }
     },
-    "daily": {
-      "2026-06-09": {
-        "Estufa": 6.749572180555556,
-        "Luz dormitorio": 0.006166666666666667,
-        "Calientacama": 0.000871
-      },
-      "2026-06-10": {
-        "Estufa": 7.946549805555556,
-        "Luz dormitorio": 0.004925,
-        "Calientacama": 0.002104888888888889
-      },
-      "2026-06-11": {
-        "Estufa": 3.425701611111111,
-        "Calientacama": 0.0013266666666666667
-      },
-      "2026-06-13": {
-        "Estufa": 3.1483399166666666,
-        "Calientacama": 0.0021897500000000003
-      },
-      "2026-06-14": {
-        "Estufa": 2.712361611111111,
-        "Calientacama": 0.0024156111111111114
-      },
-      "2026-06-15": {
-        "Estufa": 10.037422083333333,
-        "Luz dormitorio": 0.059836111111111104,
-        "Living": 0.04263472222222221,
-        "Monitor": 0.07286162500000003,
-        "Calientacama": 0.21215961111111112
-      },
-      "2026-06-16": {
-        "Estufa": 1.1431034722222222,
-        "Luz dormitorio": 0.030962500000000004,
-        "Living": 0.058124999999999996,
-        "Calientacama": 0.4040096111111111
-      },
-      "2026-06-17": {
-        "Estufa": 5.979634888888889,
-        "Luz dormitorio": 0.10811805555555555,
-        "Living": 0.05279166666666666,
-        "Calientacama": 0.3556761388888889
-      },
-      "2026-06-18": {
-        "Estufa": 0.9228949166666668,
-        "Luz dormitorio": 0.14121805555555556,
-        "Living": 0.05391527777777778,
-        "Calientacama": 0.7826806944444444
-      },
-      "2026-06-19": {
-        "Estufa": 2.6228097222222226,
-        "Luz dormitorio": 0.12189166666666665,
-        "Living": 0.06360138888888889,
-        "Calientacama": 0.30822033333333326
-      },
-      "2026-06-21": {
-        "Estufa": 3.9135187777777785,
-        "Luz dormitorio": 0.23846666666666672,
-        "Living": 0.22915277777777782,
-        "Calientacama": 0.4171148888888889
-      },
-      "2026-06-22": {
-        "Estufa": 8.570208708333332,
-        "Luz dormitorio": 0.21074965277777777,
-        "Living": 0.06702083333333332,
-        "Monitor": 0.12479616666666667,
-        "Calientacama": 0.8443197083333336
-      },
-      "2026-06-23": {
-        "Estufa": 4.024326972222222,
-        "Luz dormitorio": 0.17010000000000003,
-        "Living": 0.07022916666666666,
-        "Calientacama": 0.1897374444444445
-      },
-      "2026-06-24": {
-        "Estufa": 6.462037666666667,
-        "Luz dormitorio": 0.13995277777777776,
-        "Living": 0.11068333333333336,
-        "Calientacama": 0.20642530555555555
-      },
-      "2026-06-20": {
-        "Luz dormitorio": 0.23820833333333338,
-        "Living": 0.07405833333333332,
-        "Calientacama": 0.21411033333333335,
-        "Estufa": 1.1
-      },
-      "2026-06-12": {
-        "Calientacama": 0.00042299999999999993,
-        "Estufa": 0.06
-      },
-      "2026-05-26": {
-        "Estufa": 4.5,
-        "Calientacama": 0.0,
-        "Monitor": 0.03,
-        "Fuente": 0.01
-      },
-      "2026-05-27": {
-        "Estufa": 6.5,
-        "Calientacama": 0.0,
-        "Monitor": 0.01,
-        "Fuente": 0.01
-      },
-      "2026-05-28": {
-        "Estufa": 4.5,
-        "Calientacama": 0.0,
-        "Monitor": 0.0,
-        "Fuente": 0.01
-      },
-      "2026-05-29": {
-        "Estufa": 1.5,
-        "Calientacama": 0.2,
-        "Monitor": 0.03,
-        "Fuente": 0.01
-      },
-      "2026-05-30": {
-        "Estufa": 4.5,
-        "Calientacama": 0.2,
-        "Monitor": 0.01,
-        "Fuente": 0.01
-      },
-      "2026-05-31": {
-        "Estufa": 2.04,
-        "Calientacama": 0.7,
-        "Monitor": 0.0,
-        "Fuente": 0.01
-      },
-      "2026-06-01": {
-        "Estufa": 2.36,
-        "Calientacama": 0.09,
-        "Monitor": 0.0,
-        "Fuente": 0.0
-      },
-      "2026-06-06": {
-        "Estufa": 20.013
-      },
-      "2026-06-07": {
-        "Estufa": 3.1
-      },
-      "2026-06-08": {
-        "Estufa": 3.72
-      }
-    },
     "totales_tramo": {
       "noche": 21.610358305555554,
       "dia": 21.43938570833333,
       "punta": 86.26598908333334
-    }
-  },
-  "periodo_anterior": {
-    "inicio": "2026-04-26",
-    "fin": "2026-05-25",
-    "dias_total": 30,
-    "kwh_total": 24.62,
-    "costo": {
-      "energia": 5273,
-      "cargo_fijo": 844,
-      "total": 6116,
-      "desglose_tramo": {
-        "noche": {
-          "kwh": 10.241919999999997,
-          "precio_kwh": 163.57,
-          "costo": 1675.2708543999995
-        },
-        "dia": {
-          "kwh": 8.93706,
-          "precio_kwh": 226.39,
-          "costo": 2023.2610134000001
-        },
-        "punta": {
-          "kwh": 5.44102,
-          "precio_kwh": 289.31,
-          "costo": 1574.1414962
-        }
-      }
-    },
-    "per_device": {
-      "Estufa": {
-        "noche": 9.983999999999998,
-        "dia": 8.712,
-        "punta": 5.304,
-        "total": 24.0
-      },
-      "Luz dormitorio": {
-        "noche": 0.0,
-        "dia": 0.0,
-        "punta": 0.0,
-        "total": 0.0
-      },
-      "Living": {
-        "noche": 0.0,
-        "dia": 0.0,
-        "punta": 0.0,
-        "total": 0.0
-      },
-      "Fuente": {
-        "noche": 0.00832,
-        "dia": 0.00726,
-        "punta": 0.00442,
-        "total": 0.02
-      },
-      "Luz Living": {
-        "noche": 0.0,
-        "dia": 0.0,
-        "punta": 0.0,
-        "total": 0.0
-      },
-      "Monitor": {
-        "noche": 0.0,
-        "dia": 0.0,
-        "punta": 0.0,
-        "total": 0.0
-      },
-      "Calientacama": {
-        "noche": 0.2496,
-        "dia": 0.2178,
-        "punta": 0.1326,
-        "total": 0.6
-      }
-    },
-    "totales_tramo": {
-      "noche": 10.241919999999997,
-      "dia": 8.93706,
-      "punta": 5.44102
     },
     "fuente": "muestreo"
   },

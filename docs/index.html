@@ -310,7 +310,7 @@
 
 <script>
 const DATA = {
-  "generated_at": "2026-07-25T21:06:11",
+  "generated_at": "2026-07-26T00:36:02",
   "tarifa": {
     "tipo": "THRF-T1 - Enel Distribucion",
     "comentario": "Tarifa horaria residencial flexible. Tramos en hora local Chile.",
@@ -359,16 +359,16 @@ const DATA = {
     "comentario_calculo": "precio_kwh incluye energia + transporte + IVA + descuentos G/T. cargo_fijo_mensual = administracion (709) con IVA."
   },
   "periodo_actual": {
-    "inicio": "2026-06-26",
-    "fin": "2026-07-25",
-    "dias_total": 30,
-    "dias_transcurridos": 30,
+    "inicio": "2026-07-26",
+    "fin": "2026-08-25",
+    "dias_total": 31,
+    "dias_transcurridos": 1,
     "kwh_total": 0.0,
     "kwh_proyectado": 0.0,
     "costo": {
       "energia": 0,
-      "cargo_fijo": 844,
-      "total": 844,
+      "cargo_fijo": 28,
+      "total": 28,
       "desglose_tramo": {
         "noche": {
           "kwh": 0,
@@ -440,82 +440,39 @@ const DATA = {
     }
   },
   "periodo_anterior": {
-    "inicio": "2026-05-26",
-    "fin": "2026-06-25",
-    "dias_total": 31,
-    "kwh_total": 129.316,
+    "inicio": "2026-04-24",
+    "fin": "2026-05-25",
+    "dias_total": 30,
+    "kwh_total": 297,
     "costo": {
-      "energia": 33346,
-      "cargo_fijo": 872,
-      "total": 34218,
+      "energia": 63069,
+      "cargo_fijo": 713,
+      "total": 63782,
       "desglose_tramo": {
         "noche": {
-          "kwh": 21.610358305555554,
-          "precio_kwh": 163.57,
-          "costo": 3534.806308039722
+          "kwh": 135,
+          "precio_kwh": 147.1259259259259,
+          "costo": 19862
         },
         "dia": {
-          "kwh": 21.43938570833333,
-          "precio_kwh": 226.39,
-          "costo": 4853.662530509582
+          "kwh": 96,
+          "precio_kwh": 210.1875,
+          "costo": 20178
         },
         "punta": {
-          "kwh": 86.26598908333334,
-          "precio_kwh": 289.31,
-          "costo": 24957.61330169917
+          "kwh": 66,
+          "precio_kwh": 273.24242424242425,
+          "costo": 18034
         }
       }
     },
-    "per_device": {
-      "Estufa": {
-        "noche": 18.390514777777778,
-        "dia": 19.391722791666663,
-        "punta": 83.76924476388889,
-        "total": 121.55148233333334
-      },
-      "Luz dormitorio": {
-        "noche": 0.4107208333333336,
-        "dia": 0.6663763888888893,
-        "punta": 0.3934982638888891,
-        "total": 1.4705954861111101
-      },
-      "Living": {
-        "noche": 0.2734250000000001,
-        "dia": 0.15132638888888886,
-        "punta": 0.39746111111111126,
-        "total": 0.8222125000000005
-      },
-      "Fuente": {
-        "noche": 0.02496,
-        "dia": 0.02178,
-        "punta": 0.013260000000000001,
-        "total": 0.060000000000000005
-      },
-      "Luz Living": {
-        "noche": 0.0,
-        "dia": 0.0,
-        "punta": 0.0,
-        "total": 0.0
-      },
-      "Monitor": {
-        "noche": 0.03328,
-        "dia": 0.18984073611111113,
-        "punta": 0.05453705555555556,
-        "total": 0.2776577916666667
-      },
-      "Calientacama": {
-        "noche": 2.4774576944444444,
-        "dia": 1.018339402777778,
-        "punta": 1.637987888888889,
-        "total": 5.133784986111111
-      }
-    },
+    "per_device": {},
     "totales_tramo": {
-      "noche": 21.610358305555554,
-      "dia": 21.43938570833333,
-      "punta": 86.26598908333334
+      "noche": 135,
+      "dia": 96,
+      "punta": 66
     },
-    "fuente": "muestreo"
+    "fuente": "boleta"
   },
   "historico_anual": [
     {
